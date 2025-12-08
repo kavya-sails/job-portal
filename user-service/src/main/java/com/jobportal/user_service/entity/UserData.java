@@ -33,7 +33,7 @@ public class UserData {
     //  Resume Upload Fields
     private String resumeUrl;
 
-    private Long resumeSize;
+    private LocalDateTime dob;
 
     private LocalDateTime resumeUploadedAt;
 
