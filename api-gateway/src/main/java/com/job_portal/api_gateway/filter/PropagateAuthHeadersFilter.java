@@ -16,7 +16,7 @@ public class PropagateAuthHeadersFilter implements WebFilter {
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         return ReactiveSecurityContextHolder.getContext()
                 .map(SecurityContext::getAuthentication)
-                .filter(auth -> auth!=null && auth.isAuthenticated())
+                .filter(auth -> auth != null && auth.isAuthenticated())
                 .flatMap(auth -> {
                     if (auth == null || !(auth.getPrincipal() instanceof JwtReactiveAuthenticationManager.JwtAuthenticationPrincipal p)) {
                         return chain.filter(exchange);

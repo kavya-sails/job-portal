@@ -1,4 +1,5 @@
 package com.job_portal.api_gateway.security;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
