@@ -20,7 +20,12 @@ public class UserData {
 
     //  Basic Profile Info
     @Column(nullable = false)
-    private String name;
+    private String fullName;
+
+    @Column(nullable = false)
+    private String lastName;
+
+    private String address;
 
     @Column(nullable = false, unique = true)
     private String email;
