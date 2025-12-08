@@ -72,6 +72,8 @@ public class UserData {
         if (this.isActive == null) this.isActive = true;
     }
 
+    //
+
     @PreUpdate
     public void onUpdate() {
         this.updatedAt = LocalDateTime.now();
