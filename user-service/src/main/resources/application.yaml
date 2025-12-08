@@ -26,3 +26,7 @@ spring:
       max-file-size: 2MB
       max-request-size: 2MB
 
+security:
+  jwt:
+    secret-key: xyzdkjdcheiufhuewewoicewhi938673r93
+    expiration-time: 864000006

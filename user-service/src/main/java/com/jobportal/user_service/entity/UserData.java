@@ -38,13 +38,14 @@ public class UserData {
     private LocalDateTime resumeUploadedAt;
 
     //  Soft Delete (Deactivate Account)
-    private Boolean isActive = true;
+    private Boolean isActive = (Boolean) true;
 
     //  Auditing
     private LocalDateTime createdAt;
 
 
     // dfghjhkjkjhjhjhjjh
+    // dhanush is good boy
     private LocalDateTime updatedAt;
 
     //  Auto Timestamp Handling
