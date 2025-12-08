@@ -72,7 +72,7 @@ public class UserData {
         if (this.isActive == null) this.isActive = true;
     }
 
-    //
+    //Updating
 
     @PreUpdate
     public void onUpdate() {
