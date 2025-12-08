@@ -3,6 +3,7 @@ package com.jobportal.user_service.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -18,46 +19,57 @@ public class UserData {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    //  Basic Profile Info
-    @Column(nullable = false)
-    private String fullName;
+    // Basic Profile Info
+    @Column(nullable = false, length = 50)
+    private String firstName;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 50)
     private String lastName;
 
-    private String address;
-
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, length = 50)
     private String email;
 
-    @Column(length = 10)
+    @Column
+    private LocalDate dob;
+
+    @Column(length = 255)
+    private String address;
+
+    @Column(length = 15)
     private String phone;
 
+    @Column(length = 100)
+    private String highestEducation;
+
+    @Column(length = 500)
     private String skills;
 
-    //  Resume Upload Fields
+    @Column
+    private Integer experience;
+
+    @Column(length = 100)
     private String resumeUrl;
 
-    private LocalDateTime dob;
-
+    @Column
     private LocalDateTime resumeUploadedAt;
 
-    //  Soft Delete (Deactivate Account)
-    private Boolean isActive = (Boolean) true;
+    // Soft Delete
+    @Column(nullable = false)
+    private Boolean isActive = true;
 
-    //  Auditing
+    // Auditing
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-
-    // dfghjhkjkjhjhjhjjh
-    // dhanush is good boy
+    @Column(nullable = false)
     private LocalDateTime updatedAt;
 
-    //  Auto Timestamp Handling
+    // Auto Timestamp Handling
     @PrePersist
     public void onCreate() {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
+        if (this.isActive == null) this.isActive = true;
     }
 
     @PreUpdate
