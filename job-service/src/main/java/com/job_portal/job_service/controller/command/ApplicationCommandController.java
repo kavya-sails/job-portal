@@ -1,5 +1,6 @@
 package com.job_portal.job_service.controller.command;
 
+import com.job_portal.job_service.dto.command.ApplyJobCommand;
 import com.job_portal.job_service.entity.ApplicationEntity;
 import com.job_portal.job_service.service.command.ApplicationCommandService;
 import jakarta.validation.Valid;
