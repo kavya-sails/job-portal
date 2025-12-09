@@ -29,4 +29,7 @@ public class JobEntity {
 
     @Column(name = "posted_date")
     private Instant postedDate;
+
+    @Column(name = "expires_at")
+    private Instant expiresAt;
 }
