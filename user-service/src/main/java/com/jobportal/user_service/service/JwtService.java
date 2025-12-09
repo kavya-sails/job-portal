@@ -22,10 +22,10 @@ public class JwtService {
     @Value("${security.jwt.expiration-time}")
     private long jwtExpiration;
 
-    // ✅ ONLY TOKEN GENERATION (NO VALIDATION)
+    //  ONLY TOKEN GENERATION (NO VALIDATION)
     public String generateToken(UserData user) {
 
-        // ✅ Custom payload (claims)
+        //  Custom payload (claims)
         Map<String, Object> claims = new HashMap<>();
         claims.put("email", user.getEmail());
         claims.put("isActive", user.getIsActive());
@@ -40,7 +40,7 @@ public class JwtService {
                 .compact();
     }
 
-    // ✅ Secret key builder
+    //  Secret key builder
     private SecretKey getSecretKey() {
         byte[] keyBytes = secretKey.getBytes(StandardCharsets.UTF_8);
         return Keys.hmacShaKeyFor(keyBytes);

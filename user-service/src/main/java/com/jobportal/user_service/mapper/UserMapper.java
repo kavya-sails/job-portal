@@ -1,5 +1,6 @@
 package com.jobportal.user_service.mapper;
 
+import com.jobportal.user_service.dto.UserPartialUpdateDto;
 import com.jobportal.user_service.dto.UserRequestDto;
 import com.jobportal.user_service.dto.UserResponseDto;
 import com.jobportal.user_service.entity.UserData;
@@ -47,4 +48,8 @@ public interface UserMapper {
         }
         return entity.getResumeUploadedAt();
     }
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    void patchEntityFromDto(UserPartialUpdateDto dto, @MappingTarget UserData entity);
+
 }

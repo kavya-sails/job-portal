@@ -24,10 +24,10 @@ public class SecurityConfig {
                 )
 
                 //  Allow login API without authentication
-/*                .authorizeHttpRequests(auth -> auth
+                .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/users/login").permitAll()
                         .anyRequest().authenticated()
-                )*/
+                )
 
                 // URL authorization rules
                 .authorizeHttpRequests(auth -> auth

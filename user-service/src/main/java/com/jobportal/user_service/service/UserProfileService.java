@@ -1,6 +1,7 @@
 package com.jobportal.user_service.service;
 
 
+import com.jobportal.user_service.dto.UserPartialUpdateDto;
 import com.jobportal.user_service.dto.UserRequestDto;
 import com.jobportal.user_service.dto.UserResponseDto;
 import com.jobportal.user_service.entity.UserData;
@@ -50,6 +51,17 @@ public class UserProfileService {
 
         // MapStruct partial update
         userMapper.updateEntityFromDto(dto, user);
+
+        UserData updatedUser = userDataRepository.save(user);
+        return userMapper.toResponseDto(updatedUser);
+    }
+
+    public UserResponseDto partialUpdateUserProfile(Long id, UserPartialUpdateDto dto) {
+        UserData user = userDataRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+
+        // Partial update via MapStruct, only non-null fields from dto
+        userMapper.patchEntityFromDto(dto, user);
 
         UserData updatedUser = userDataRepository.save(user);
         return userMapper.toResponseDto(updatedUser);
