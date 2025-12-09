@@ -2,7 +2,6 @@ package com.jobportal.user_service.service;
 
 
 import com.jobportal.user_service.entity.AuthUser;
-import com.jobportal.user_service.entity.UserData;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;

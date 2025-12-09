@@ -3,7 +3,7 @@ package com.jobportal.user_service.mapper;
 import com.jobportal.user_service.dto.UserPartialUpdateDto;
 import com.jobportal.user_service.dto.UserRequestDto;
 import com.jobportal.user_service.dto.UserResponseDto;
-import com.jobportal.user_service.entity.UserData;
+import com.jobportal.user_service.entity.UserProfile;
 import org.mapstruct.*;
 
 import java.time.LocalDateTime;
@@ -21,13 +21,13 @@ public interface UserMapper {
             @Mapping(target = "createdAt", ignore = true),
             @Mapping(target = "updatedAt", ignore = true)
     })
-    UserData toEntity(UserRequestDto dto);
+    UserProfile toEntity(UserRequestDto dto);
 
     //Entity to ResponseDto
-    UserResponseDto toResponseDto(UserData user);
+    UserResponseDto toResponseDto(UserProfile user);
 
     // List of Entities to List of ResponseDto
-    List<UserResponseDto> toResponseDTOList(List<UserData> users);
+    List<UserResponseDto> toResponseDTOList(List<UserProfile> users);
 
     // Update existing entity from Request Dto
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -39,10 +39,10 @@ public interface UserMapper {
             @Mapping(target = "resumeUploadedAt",
                     expression = "java(updateResumeTimestamp(dto, entity))")
     })
-    void updateEntityFromDto(UserRequestDto dto, @MappingTarget UserData entity);
+    void updateEntityFromDto(UserRequestDto dto, @MappingTarget UserProfile entity);
 
     // Helper to update resumeUploadedAt only when URL changes
-    default LocalDateTime updateResumeTimestamp(UserRequestDto dto, UserData entity) {
+    default LocalDateTime updateResumeTimestamp(UserRequestDto dto, UserProfile entity) {
         if (dto.getResumeUrl() != null && !dto.getResumeUrl().equals(entity.getResumeUrl())) {
             return LocalDateTime.now();
         }
@@ -50,6 +50,6 @@ public interface UserMapper {
     }
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    void patchEntityFromDto(UserPartialUpdateDto dto, @MappingTarget UserData entity);
+    void patchEntityFromDto(UserPartialUpdateDto dto, @MappingTarget UserProfile entity);
 
 }
