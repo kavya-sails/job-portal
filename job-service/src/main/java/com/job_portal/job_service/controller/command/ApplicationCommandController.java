@@ -2,6 +2,7 @@ package com.job_portal.job_service.controller.command;
 
 import com.job_portal.job_service.entity.ApplicationEntity;
 import com.job_portal.job_service.service.command.ApplicationCommandService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -13,9 +14,29 @@ import org.springframework.web.bind.annotation.*;
 public class ApplicationCommandController
 {
     private final ApplicationCommandService commandService;
-    @PostMapping
-    public ResponseEntity<ApplicationEntity> apply(@RequestHeader("X-USER-ID") String userId,
-                                                   @RequestHeader("X-JOB-ID") Long jobId) {
+
+    /**
+     * Apply to a job.
+     * jobId comes from the URL.
+     * userId comes from API Gateway header.
+     */
+    @PostMapping("/{jobId}")
+    public ResponseEntity<ApplicationEntity> apply(
+            @PathVariable Long jobId,
+            HttpServletRequest request
+    ) {
+        String userId = request.getHeader("X-USER-ID");
+        String role = request.getHeader("X-ROLE");
+
+        if (userId == null) {
+            return ResponseEntity.badRequest().body(null);
+        }
+
+        // Only USER can apply, not ADMIN
+        if (role == null || !role.equalsIgnoreCase("USER")) {
+            return ResponseEntity.status(403).build();
+        }
+
         ApplicationEntity saved = commandService.apply(userId, jobId);
         return ResponseEntity.ok(saved);
     }
