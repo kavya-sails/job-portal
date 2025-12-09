@@ -23,11 +23,11 @@ public class SecurityConfig {
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
 
-                //  Allow login API without authentication
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/users/login").permitAll()
-                        .anyRequest().authenticated()
-                )
+//                //  Allow login API without authentication
+//                .authorizeHttpRequests(auth -> auth
+//                        .requestMatchers("/api/users/login").permitAll()
+//                        .anyRequest().authenticated()
+//                )
 
                 // URL authorization rules
                 .authorizeHttpRequests(auth -> auth
@@ -37,6 +37,8 @@ public class SecurityConfig {
 
                         // 2) Login is public too (if you want)
                         .requestMatchers("/api/users/login").permitAll()
+
+                        .requestMatchers("/api/auth/**").permitAll()
 
 
                         // everything else must be authenticated

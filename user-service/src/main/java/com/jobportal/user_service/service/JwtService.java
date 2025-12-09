@@ -1,6 +1,7 @@
 package com.jobportal.user_service.service;
 
 
+import com.jobportal.user_service.entity.AuthUser;
 import com.jobportal.user_service.entity.UserData;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -22,18 +23,18 @@ public class JwtService {
     @Value("${security.jwt.expiration-time}")
     private long jwtExpiration;
 
-    //  ONLY TOKEN GENERATION (NO VALIDATION)
-    public String generateToken(UserData user) {
+    //  TOKEN GENERATION USING AuthUser
+    public String generateToken(AuthUser user) {
 
-        //  Custom payload (claims)
         Map<String, Object> claims = new HashMap<>();
-        claims.put("email", user.getEmail());
+        claims.put("username", user.getUsername());
+        claims.put("role", user.getRole().getRoleName());
         claims.put("isActive", user.getIsActive());
 
         return Jwts
                 .builder()
                 .setClaims(claims)                                  // ⬅️ change is here
-                .setSubject(String.valueOf(user.getId()))          // main identity
+                .setSubject(String.valueOf(user.getUserId()))        // main identity
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
                 .signWith(getSecretKey())
