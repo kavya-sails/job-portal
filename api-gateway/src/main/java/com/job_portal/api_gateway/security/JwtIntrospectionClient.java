@@ -9,13 +9,13 @@ import reactor.core.publisher.Mono;
 
 import java.util.Map;
 
+//makes a remote HTTP call to the introspection endpoint on your user-service.
 @Component
 @RequiredArgsConstructor
 public class JwtIntrospectionClient {
     private final WebClient webClient;
-
     /**
-     * Calls auth-service introspect endpoint. Expected response shape:
+     * Calls user-service introspect endpoint. Expected response shape:
      * { "active": true|false, "claims": {...} }
      */
     public Mono<Map> introspect(String url, String authHeader) {

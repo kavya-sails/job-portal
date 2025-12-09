@@ -19,10 +19,8 @@ import org.springframework.security.web.server.context.NoOpServerSecurityContext
 @RequiredArgsConstructor
 @Slf4j
 public class SecurityConfig {
-
     private final ReactiveAuthenticationManager jwtReactiveAuthenticationManager;
     private final ServerAuthenticationConverter bearerTokenConverter;
-
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         AuthenticationWebFilter authenticationWebFilter =
@@ -30,17 +28,13 @@ public class SecurityConfig {
         authenticationWebFilter.setServerAuthenticationConverter(bearerTokenConverter);
         // No session; store auth only in Reactor Context
         authenticationWebFilter.setSecurityContextRepository(NoOpServerSecurityContextRepository.getInstance());
-
         return http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers("/api/auth/login", "/api/auth/register", "/actuator/**").permitAll()
 
-                        .pathMatchers(HttpMethod.POST, "/api/interns").hasRole("ADMIN")
-                        .pathMatchers(HttpMethod.PATCH, "/api/interns/*/assign-mentor").hasRole("ADMIN")
-                        .pathMatchers("/api/interns/me").hasRole("MENTOR")
-
+                        .pathMatchers(HttpMethod.POST, "/api/users").hasRole("ADMIN")
                         .anyExchange().authenticated()
                 )
                 // Ensure our auth filter runs at AUTHENTICATION order (before AUTHORIZATION)
