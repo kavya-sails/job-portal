@@ -1,6 +1,5 @@
 package com.job_portal.job_service.service.command;
 
-import com.job_portal.job_service.dto.command.ApplyJobCommand;
 import com.job_portal.job_service.entity.ApplicationEntity;
 import com.job_portal.job_service.entity.ApplicationStatus;
 import com.job_portal.job_service.entity.JobEntity;
@@ -21,18 +20,18 @@ public class ApplicationCommandService {
     private final JobQueryRepository jobQueryRepository;
 
     @Transactional
-    public ApplicationEntity apply(@Valid ApplyJobCommand command) {
+    public ApplicationEntity apply(String userId, Long jobId) {
         // ensure job exists
-        JobEntity job = jobQueryRepository.findById(command.getJobId())
-                .orElseThrow(() -> new JobNotFoundException(command.getJobId()));
+        JobEntity job = jobQueryRepository.findById(jobId)
+                .orElseThrow(() -> new JobNotFoundException(jobId));
 
         // check conflict - same user applied before
-        applicationCommandRepository.findByJobJobIdAndUserId(command.getJobId(), command.getUserId())
+        applicationCommandRepository.findByJobJobIdAndUserId(jobId, userId)
                 .ifPresent(a -> { throw new ApplicationConflictException("User already applied to this job"); });
 
         ApplicationEntity app = ApplicationEntity.builder()
                 .job(job)
-                .userId(command.getUserId())
+                .userId( userId)
                 .appliedDate(Instant.now())
                 .status(ApplicationStatus.PENDING)
                 .build();

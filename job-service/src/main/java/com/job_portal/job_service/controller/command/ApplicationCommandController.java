@@ -1,15 +1,11 @@
 package com.job_portal.job_service.controller.command;
 
-import com.job_portal.job_service.dto.command.ApplyJobCommand;
 import com.job_portal.job_service.entity.ApplicationEntity;
 import com.job_portal.job_service.service.command.ApplicationCommandService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/applications")
@@ -17,10 +13,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class ApplicationCommandController
 {
     private final ApplicationCommandService commandService;
-
     @PostMapping
-    public ResponseEntity<ApplicationEntity> apply(@Valid @RequestBody ApplyJobCommand command) {
-        ApplicationEntity saved = commandService.apply(command);
+    public ResponseEntity<ApplicationEntity> apply(@RequestHeader("X-USER-ID") String userId,
+                                                   @RequestHeader("X-JOB-ID") Long jobId) {
+        ApplicationEntity saved = commandService.apply(userId, jobId);
         return ResponseEntity.ok(saved);
     }
 }

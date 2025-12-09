@@ -6,8 +6,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface JobQueryRepository extends JpaRepository<JobEntity, Long> {
-    Page<JobEntity> findByLocationContainingIgnoreCaseAndExperienceRequiredLessThanEqual(String location, Integer experience, Pageable pageable);
+import java.util.List;
 
-    Page<JobEntity> findByLocationContainingIgnoreCase(String location, Pageable pageable);
+public interface JobQueryRepository extends JpaRepository<JobEntity, Long> {
+    List<JobEntity> findAll();
+
 }
