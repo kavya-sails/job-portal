@@ -21,17 +21,16 @@ public class ApplicationCommandService {
 
     @Transactional
     public ApplicationEntity apply(String userId, Long jobId) {
-        // ensure job exists
+
         JobEntity job = jobQueryRepository.findById(jobId)
                 .orElseThrow(() -> new JobNotFoundException(jobId));
 
-        // check conflict - same user applied before
         applicationCommandRepository.findByJobJobIdAndUserId(jobId, userId)
                 .ifPresent(a -> { throw new ApplicationConflictException("User already applied to this job"); });
 
         ApplicationEntity app = ApplicationEntity.builder()
                 .job(job)
-                .userId( userId)
+                .userId(userId)
                 .appliedDate(Instant.now())
                 .status(ApplicationStatus.PENDING)
                 .build();
