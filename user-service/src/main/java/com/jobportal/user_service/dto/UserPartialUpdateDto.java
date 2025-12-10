@@ -46,6 +46,10 @@ public class UserPartialUpdateDto {
     private String highestEducation;
 
     @Size(max = 500, message = "Skills must not exceed 500 characters")
+    @Pattern(
+            regexp = "^[^,]+(,[^,]+)*$",
+            message = "Skills must be separated by commas"
+    )
     private String skills;
 
     @Min(value = 0, message = "Experience cannot be negative")
