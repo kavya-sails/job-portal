@@ -28,7 +28,7 @@ public class AuthUserService {
     public String register(RegisterRequest request) {
 
         //  Check if username already exists
-        if (authUserRepository.existsByUsername(request.getUsername())) {
+        if (authUserRepository.existsByEmail(request.getEmail())) {
             return "Username already exists";
         }
 
@@ -38,7 +38,7 @@ public class AuthUserService {
 
         //  Create AuthUser
         AuthUser user = new AuthUser();
-        user.setUsername(request.getUsername());
+        user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword())); // encrypted
         user.setRole(role);
         user.setIsActive(true);
@@ -50,7 +50,7 @@ public class AuthUserService {
 
     public String login(LoginRequest request) {
 
-        AuthUser user = authUserRepository.findByUsername(request.getUsername())
+        AuthUser user = authUserRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("Invalid username"));
 
         if (!user.getIsActive()) {
@@ -64,6 +64,5 @@ public class AuthUserService {
         //  Generate JWT Token
         return jwtService.generateToken(user);
     }
-
 
 }

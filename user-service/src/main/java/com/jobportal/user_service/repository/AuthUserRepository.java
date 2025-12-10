@@ -10,8 +10,8 @@ import java.util.Optional;
 public interface AuthUserRepository extends JpaRepository<AuthUser, Long> {
 
     //  Used during LOGIN
-    Optional<AuthUser> findByUsername(String username);
+    Optional<AuthUser> findByEmail(String email);
 
     //  Used during REGISTER to prevent duplicates
-    boolean existsByUsername(String username);
+    boolean existsByEmail(String email);
 }

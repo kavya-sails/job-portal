@@ -1,6 +1,7 @@
 package com.jobportal.user_service.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -19,7 +20,8 @@ public class AuthUser {
 
     //  Login Credentials
     @Column(nullable = false, unique = true)
-    private String username;
+    @Email
+    private String email;
 
     @Column(nullable = false)
     private String password;

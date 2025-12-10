@@ -51,6 +51,10 @@ public class UserRequestDto {
     private String highestEducation;
 
     @Size(max = 500, message = "Skills must not exceed 500 characters")
+    @Pattern(
+            regexp = "^[^,]+(,[^,]+)*$",
+            message = "Skills must be separated by commas"
+    )
     private String skills;
 
     @NotNull(message = "Experience is required")
