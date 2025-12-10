@@ -3,6 +3,7 @@
 INSERT INTO roles (role_name)
 VALUES
     ('ADMIN'),
+    ('RECRUITER')
     ('USER');
 
 INSERT INTO auth_users (email, password, role_id, is_active, created_at, updated_at)

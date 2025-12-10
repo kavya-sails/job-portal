@@ -17,6 +17,10 @@ public class GatewayRoutesConfig {
                         .path("/api/users/**")
                         .uri("lb://USER-SERVICE")
                 )
+                .route("job-route",r->r
+                        .path("api/jobs/**")
+                        .uri("lb://JOB-SERVICE")
+                )
                 .build();
     }
 }

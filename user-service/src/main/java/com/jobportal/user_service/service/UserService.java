@@ -30,7 +30,7 @@ public class UserService {
         }
 
         //  Find role (USER / ADMIN)
-        Role role = roleRepository.findByRoleName("USER")
+        Role role = roleRepository.findByRoleName(request.getRoleName())
                 .orElseThrow(() -> new RuntimeException("Role not found"));
 
         //  Create AuthUser

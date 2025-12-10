@@ -40,7 +40,6 @@ public class JwtTokenValidator {
         if (sub == null) return null;
         try { return Long.valueOf(sub); } catch (NumberFormatException e) { return null; }
     }
-
     //roles claim can be in different formats depending on your user service
     @SuppressWarnings("unchecked")
     public String getRole(Jwt jwt) {
