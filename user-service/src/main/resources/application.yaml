@@ -1,0 +1,32 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: user-service
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/job_portal_user
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 2MB
+      max-request-size: 2MB
+
+security:
+  jwt:
+    secret-key: xyzdkjdcheiufhuewewoicewhi938673r93
+    expiration-time: 864000006
