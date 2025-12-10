@@ -10,6 +10,7 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -17,8 +18,9 @@ public class JobQueryService {
 
     private final JobQueryRepository jobRepo;
 
-    public List<JobEntity> getAllJobs() {
-        return jobRepo.findAll();
+    public List<JobDetailsQueryDto> getAllJobs() {
+        List<JobEntity> jobs = jobRepo.findAll();
+        return jobs.stream().map(JobApplicationMapper::toDetails).collect(Collectors.toList());
     }
 
     public JobDetailsQueryDto getJobDetails(Long jobId) {

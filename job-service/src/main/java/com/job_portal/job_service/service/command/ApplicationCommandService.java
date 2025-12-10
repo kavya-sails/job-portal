@@ -37,4 +37,13 @@ public class ApplicationCommandService {
 
         return applicationCommandRepository.save(app);
     }
+
+    @Transactional
+    public ApplicationEntity updateStatus(Long applicationId, ApplicationStatus newStatus) {
+        ApplicationEntity app = applicationCommandRepository.findById(applicationId)
+                .orElseThrow(() -> new RuntimeException("Application not found: " + applicationId));
+
+        app.setStatus(newStatus);
+        return applicationCommandRepository.save(app);
+    }
 }

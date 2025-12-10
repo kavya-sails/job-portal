@@ -1,5 +1,6 @@
 package com.job_portal.job_service.controller.command;
 
+import com.job_portal.job_service.dto.command.ApplicationStatusUpdateDto;
 import com.job_portal.job_service.entity.ApplicationEntity;
 import com.job_portal.job_service.service.command.ApplicationCommandService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -39,5 +40,22 @@ public class ApplicationCommandController
 
         ApplicationEntity saved = commandService.apply(userId, jobId);
         return ResponseEntity.ok(saved);
+    }
+    // ADMIN: UPDATE STATUS
+// =======================
+    @PutMapping("/{applicationId}/status")
+    public ResponseEntity<?> updateStatus(
+            @PathVariable Long applicationId,
+            @RequestBody ApplicationStatusUpdateDto dto,
+            HttpServletRequest request
+    ) {
+        String role = request.getHeader("X-ROLE");
+
+        // Only ADMIN is allowed
+        if (role == null || !role.equalsIgnoreCase("ADMIN")) {
+            return ResponseEntity.status(403).body("Only admin can update application status");
+        }
+
+        return ResponseEntity.ok(commandService.updateStatus(applicationId, dto.getStatus()));
     }
 }
