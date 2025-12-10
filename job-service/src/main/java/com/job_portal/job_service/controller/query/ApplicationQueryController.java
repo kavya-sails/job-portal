@@ -12,20 +12,20 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/api/applications")
+@RequestMapping("/api/jobs/applications")
 @RequiredArgsConstructor
 public class ApplicationQueryController {
     private final ApplicationQueryService queryService;
 
     @GetMapping("/history/{userId}")
-    public ResponseEntity<List<ApplicationHistoryQueryDto>> getHistory(@PathVariable String userId) {
+    public ResponseEntity<List<ApplicationHistoryQueryDto>> getHistory(@RequestHeader("X-User-Id") String userId,@RequestHeader("X-User-Role") String role ) {
         List<ApplicationHistoryQueryDto> list = queryService.getApplicationsByUser(userId);
         return ResponseEntity.ok(list);
     }
 
     @GetMapping("/dashboard/{userId}")
-    public ResponseEntity<List<ApplicationHistoryQueryDto>> getDashboard(@PathVariable String userId) {
-        // For now same as history (job title included). Could include aggregated stats in future.
+    public ResponseEntity<List<ApplicationHistoryQueryDto>> getDashboard(@RequestHeader("X-User-Id") String userId,@RequestHeader("X-User-Role")  String role ) {
+        // For now same as history (job title included). Could include aggregated status in the future.
         List<ApplicationHistoryQueryDto> list = queryService.getApplicationsByUser(userId);
         return ResponseEntity.ok(list);
     }

@@ -34,6 +34,13 @@ public class SecurityConfig {
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers("/api/users/login", "/api/users/register", "/actuator/**").permitAll()
                         .pathMatchers("/api/users").hasRole("ADMIN")
+                        .pathMatchers(HttpMethod.POST,"/api/jobs/applications/{jobId}").hasAnyRole("USER")
+                        .pathMatchers(HttpMethod.PUT,"/api/jobs/applications/{applicationId}/status").hasAnyRole("RECRUITER")
+                        .pathMatchers(HttpMethod.GET,"/api/jobs/applications/**").permitAll()
+                        .pathMatchers(HttpMethod.POST,"/api/jobs").hasAnyRole("RECRUITER")
+                        .pathMatchers(HttpMethod.PUT ,"/api/jobs/{jobId}").hasAnyRole("RECRUITER")
+                        .pathMatchers(HttpMethod.DELETE,"/api/jobs/{jobId}").hasAnyRole("ADMIN")
+                        .pathMatchers(HttpMethod.GET,"/api/jobs/**").permitAll()
                         .anyExchange().authenticated()
                 )
                 // Ensure our auth filter runs at AUTHENTICATION order (before AUTHORIZATION)

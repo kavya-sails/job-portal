@@ -22,7 +22,6 @@ public class JobQueryController {
         return ResponseEntity.ok(result);
     }
 
-
     @GetMapping("/{jobId}")
     public ResponseEntity<JobDetailsQueryDto> getJob(@PathVariable Long jobId) {
         JobDetailsQueryDto dto = jobQueryService.getJobDetails(jobId);

@@ -11,30 +11,26 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/jobs")
 @RequiredArgsConstructor
 public class JobCommandController {
-
     private final JobCommandService jobCommandService;
 
-    // Admin: create job
+    // create a job
     @PostMapping
     public ResponseEntity<JobEntity> createJob(@Valid @RequestBody JobCommandDto dto) {
         JobEntity created = jobCommandService.createJob(dto);
         return ResponseEntity.ok(created);
     }
 
-    // Admin: update job (including extend expiry_date)
+    // update a job (including extend expiry_date)
     @PutMapping("/{jobId}")
     public ResponseEntity<JobEntity> updateJob(@PathVariable Long jobId, @Valid @RequestBody JobCommandDto dto) {
         JobEntity updated = jobCommandService.updateJob(jobId, dto);
         return ResponseEntity.ok(updated);
     }
 
-    // Admin: delete job
+    // delete a job
     @DeleteMapping("/{jobId}")
     public ResponseEntity<Void> deleteJob(@PathVariable Long jobId) {
         jobCommandService.deleteJob(jobId);
         return ResponseEntity.noContent().build();
     }
-
-    // Admin: change application status (moved to applications controller? kept here for clarity)
-    // But better to put in ApplicationCommandController — we'll create separate endpoint in service layer for apps.
 }

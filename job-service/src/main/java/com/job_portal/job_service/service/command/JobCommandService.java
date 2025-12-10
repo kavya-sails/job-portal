@@ -13,22 +13,10 @@ import java.time.temporal.ChronoUnit;
 @Service
 @RequiredArgsConstructor
 public class JobCommandService {
-
-//    private final JobQueryRepository jobRepo;
-//
-//    public List<JobDetailsQueryDto> getAllJobs() {
-//        List<JobEntity> jobs = jobRepo.findAll();
-//        return jobs.stream().map(JobApplicationMapper::toDetails).collect(Collectors.toList());
-//    }
-//
-//    public JobDetailsQueryDto getJobDetails(Long jobId) {
-//        JobEntity job = jobRepo.findById(jobId).orElseThrow(() -> new JobNotFoundException(jobId));
-//        return JobApplicationMapper.toDetails(job);
-//    }
-
     private final JobQueryRepository jobRepo;
 
     public JobEntity createJob(JobCommandDto dto) {
+
         // determine postedDate (admin provided or now)
         Instant posted = dto.getPostedDate() == null ? Instant.now() : dto.getPostedDate();
 
@@ -37,7 +25,6 @@ public class JobCommandService {
         if (dto.getExpiryDays() != null && dto.getExpiryDays() > 0) {
             expiresAt = posted.plus(dto.getExpiryDays(), ChronoUnit.DAYS);
         }
-
         JobEntity j = JobEntity.builder()
                 .title(dto.getTitle())
                 .description(dto.getDescription())
@@ -51,7 +38,6 @@ public class JobCommandService {
 
     public JobEntity updateJob(Long jobId, JobCommandDto dto) {
         JobEntity job = jobRepo.findById(jobId).orElseThrow(() -> new JobNotFoundException(jobId));
-
         if (dto.getTitle() != null) job.setTitle(dto.getTitle());
         if (dto.getDescription() != null) job.setDescription(dto.getDescription());
         if (dto.getLocation() != null) job.setLocation(dto.getLocation());
@@ -68,7 +54,6 @@ public class JobCommandService {
             if (basePosted == null) basePosted = Instant.now();
             job.setExpiresAt(basePosted.plus(dto.getExpiryDays(), ChronoUnit.DAYS));
         }
-
         return jobRepo.save(job);
     }
 

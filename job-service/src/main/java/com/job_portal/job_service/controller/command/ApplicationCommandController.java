@@ -14,62 +14,32 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/applications")
+@RequestMapping("/api/jobs/applications")
 @RequiredArgsConstructor
 public class ApplicationCommandController
 {
     private final ApplicationCommandService commandService;
-
-    /**
-     * Apply to a job.
-     * jobId comes from the URL.
-     * userId comes from API Gateway header.
-     */
     @PostMapping("/{jobId}")
     public ResponseEntity<ApplicationEntity> apply(
             @PathVariable Long jobId,
-            HttpServletRequest request
-    ) {
-        String userId = request.getHeader("X-USER-ID");
-        String role = request.getHeader("X-ROLE");
-
-        if (userId == null) {
-            return ResponseEntity.badRequest().body(null);
-        }
-
-        // Only USER can apply, not ADMIN
-        if (role == null || !role.equalsIgnoreCase("USER")) {
-            return ResponseEntity.status(403).build();
-        }
-
+            @RequestHeader("X-User-Id") String userId)
+    {
+        if (userId == null) return ResponseEntity.badRequest().body(null);
         ApplicationEntity saved = commandService.apply(userId, jobId);
         return ResponseEntity.ok(saved);
     }
-    // ADMIN: UPDATE STATUS
-// =======================
+
+    // Update application status
     @PutMapping("/{applicationId}/status")
     public ResponseEntity<?> updateStatus(
             @PathVariable Long applicationId,
-            @RequestBody ApplicationStatusUpdateDto dto,
-            HttpServletRequest request
-    ) {
-        String role = request.getHeader("X-ROLE");
-
-        // Only ADMIN is allowed
-        if (role == null || !role.equalsIgnoreCase("ADMIN")) {
-            return ResponseEntity.status(403).body("Only admin can update application status");
-        }
-
+            @RequestBody ApplicationStatusUpdateDto dto)
+    {
         ApplicationEntity updated = commandService.updateStatus(applicationId, dto.getStatus());
-
         ApplicationStatusResponseDto resp = ApplicationStatusResponseDto.builder()
                 .applicationId(updated.getApplicationId())
                 .status(updated.getStatus())
                 .build();
-
         return ResponseEntity.ok(resp);
-
-        // Return small JSON object instead of whole entity
-
     }
 }
