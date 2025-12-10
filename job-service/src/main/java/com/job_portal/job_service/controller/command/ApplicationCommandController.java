@@ -1,5 +1,6 @@
 package com.job_portal.job_service.controller.command;
 
+import com.job_portal.job_service.dto.command.ApplicationStatusResponseDto;
 import com.job_portal.job_service.dto.command.ApplicationStatusUpdateDto;
 import com.job_portal.job_service.entity.ApplicationEntity;
 import com.job_portal.job_service.service.command.ApplicationCommandService;
@@ -8,6 +9,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/applications")
@@ -56,6 +60,16 @@ public class ApplicationCommandController
             return ResponseEntity.status(403).body("Only admin can update application status");
         }
 
-        return ResponseEntity.ok(commandService.updateStatus(applicationId, dto.getStatus()));
+        ApplicationEntity updated = commandService.updateStatus(applicationId, dto.getStatus());
+
+        ApplicationStatusResponseDto resp = ApplicationStatusResponseDto.builder()
+                .applicationId(updated.getApplicationId())
+                .status(updated.getStatus())
+                .build();
+
+        return ResponseEntity.ok(resp);
+
+        // Return small JSON object instead of whole entity
+
     }
 }

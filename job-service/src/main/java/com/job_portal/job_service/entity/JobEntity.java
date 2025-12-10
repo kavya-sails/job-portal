@@ -1,5 +1,6 @@
 package com.job_portal.job_service.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,6 +12,7 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonIgnoreProperties({"hibernateLazyInitializer","handler"})
 public class JobEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
