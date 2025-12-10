@@ -18,7 +18,8 @@ public class JobQueryController {
     private final JobQueryService jobQueryService;
     @GetMapping
     public ResponseEntity<List<JobDetailsQueryDto>> listJobs() {
-        return ResponseEntity.ok(jobQueryService.getAllJobs());
+        List<JobDetailsQueryDto> result = jobQueryService.getAllJobs();
+        return ResponseEntity.ok(result);
     }
 
 

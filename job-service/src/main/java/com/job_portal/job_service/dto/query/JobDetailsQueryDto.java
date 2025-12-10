@@ -14,4 +14,5 @@ public class JobDetailsQueryDto {
     private String location;
     private Integer experienceRequired;
     private Instant postedDate;
+    private Instant expiresAt;
 }
