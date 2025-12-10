@@ -8,7 +8,6 @@ import com.job_portal.job_service.exception.JobNotFoundException;
 import com.job_portal.job_service.repository.command.ApplicationCommandRepository;
 import com.job_portal.job_service.repository.query.JobQueryRepository;
 import jakarta.transaction.Transactional;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

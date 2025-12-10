@@ -1,15 +1,19 @@
 package com.job_portal.job_service.controller.query;
 
 import com.job_portal.job_service.dto.query.ApplicationHistoryQueryDto;
+import com.job_portal.job_service.entity.ApplicationEntity;
 import com.job_portal.job_service.service.query.ApplicationQueryService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.List;
+
+import static org.apache.commons.lang.StringEscapeUtils.escapeCsv;
+
 @RestController
 @RequestMapping("/api/applications")
 @RequiredArgsConstructor
