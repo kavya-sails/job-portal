@@ -23,7 +23,7 @@ public interface UserMapper {
     })
     UserProfile toEntity(UserRequestDto dto);
 
-    //Entity to ResponseDto
+    // Entity to ResponseDto (email set in service)
     UserResponseDto toResponseDto(UserProfile user);
 
     // List of Entities to List of ResponseDto
@@ -50,6 +50,11 @@ public interface UserMapper {
     }
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mappings({
+            @Mapping(target = "id", ignore = true),
+            @Mapping(target = "createdAt", ignore = true),
+            @Mapping(target = "updatedAt", ignore = true)
+    })
     void patchEntityFromDto(UserPartialUpdateDto dto, @MappingTarget UserProfile entity);
 
 }

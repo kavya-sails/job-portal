@@ -15,8 +15,9 @@ import java.time.LocalDateTime;
 @Builder
 public class UserProfile {
 
+    // Primary key (and DB-level FK to auth_users.user_id)
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
     // -------------------- BASIC INFO --------------------
@@ -27,8 +28,7 @@ public class UserProfile {
     @Column(name = "last_name", nullable = false, length = 50)
     private String lastName;
 
-    @Column(name = "email", nullable = false, unique = true, length = 50)
-    private String email;
+    // No email here – comes from AuthUser
 
     @Column(name = "dob")
     private LocalDate dob;

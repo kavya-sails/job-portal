@@ -26,8 +26,8 @@ public class UserPartialUpdateDto {
     )
     private String lastName;
 
-    @Email(message = "Invalid email format")
-    private String email;
+/*    @Email(message = "Invalid email format")
+    private String email;*/
 
     @Past(message = "Date of birth must be in the past")
     private LocalDate dob;

@@ -28,9 +28,9 @@ public class UserRequestDto {
     )
     private String lastName;
 
-    @NotBlank(message = "Email is required")
+/*    @NotBlank(message = "Email is required")
     @Email(message = "Invalid email format")
-    private String email;
+    private String email;*/
 
     @NotNull(message = "Date of birth is required")
     @Past(message = "Date of birth must be in the past")
