@@ -25,8 +25,5 @@ public class JobCommandDto {
      */
     private Instant postedDate;
 
-    /**
-     * Optional: expiresAt — admin can set expiry timestamp
-     */
-    private Instant expiresAt;
+    private Integer expiryDays;
 }
