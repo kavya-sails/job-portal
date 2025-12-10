@@ -9,7 +9,7 @@ INSERT INTO auth_users (email, password, role_id, is_active, created_at, updated
 VALUES
 (
     'admin@jobportal.com',
-    '$2a$10$7EqJtq98hPqEX7fNZaFWoOhi5Qf5cCBw7O3ZXk4Br5qv4QF6n1r9m',
+    '{noop}password',
     1,
     1,
     NOW(),

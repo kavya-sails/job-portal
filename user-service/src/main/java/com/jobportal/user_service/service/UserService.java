@@ -4,36 +4,33 @@ import com.jobportal.user_service.dto.LoginRequest;
 import com.jobportal.user_service.dto.RegisterRequest;
 import com.jobportal.user_service.entity.AuthUser;
 import com.jobportal.user_service.entity.Role;
-import com.jobportal.user_service.repository.AuthUserRepository;
+import com.jobportal.user_service.repository.UserRepository;
 import com.jobportal.user_service.repository.RoleRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
-public class AuthUserService {
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
+public class UserService {
 
-    @Autowired
-    private AuthUserRepository authUserRepository;
-
-    @Autowired
-    private RoleRepository roleRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private JwtService jwtService;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
     public String register(RegisterRequest request) {
 
         //  Check if username already exists
-        if (authUserRepository.existsByEmail(request.getEmail())) {
+        if (userRepository.existsByEmail(request.getEmail())) {
             return "Username already exists";
         }
 
         //  Find role (USER / ADMIN)
-        Role role = roleRepository.findByRoleName(request.getRoleName())
+        Role role = roleRepository.findByRoleName("USER")
                 .orElseThrow(() -> new RuntimeException("Role not found"));
 
         //  Create AuthUser
@@ -43,14 +40,14 @@ public class AuthUserService {
         user.setRole(role);
         user.setIsActive(true);
 
-        authUserRepository.save(user);
+        userRepository.save(user);
 
         return "User registered successfully";
     }
 
     public String login(LoginRequest request) {
 
-        AuthUser user = authUserRepository.findByEmail(request.getEmail())
+        AuthUser user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("Invalid username"));
 
         if (!user.getIsActive()) {
@@ -65,4 +62,7 @@ public class AuthUserService {
         return jwtService.generateToken(user);
     }
 
+    public List<AuthUser> findAll() {
+        return userRepository.findAll();
+    }
 }
