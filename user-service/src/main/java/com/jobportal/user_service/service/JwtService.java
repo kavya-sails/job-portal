@@ -22,9 +22,8 @@ public class JwtService {
     @Value("${security.jwt.expiration-time}")
     private long jwtExpiration;
 
-    //  TOKEN GENERATION USING AuthUser
+    // TOKEN GENERATION
     public String generateToken(AuthUser user) {
-
         Map<String, Object> claims = new HashMap<>();
         claims.put("username", user.getEmail());
         claims.put("role", user.getRole().getRoleName());
@@ -32,15 +31,16 @@ public class JwtService {
 
         return Jwts
                 .builder()
-                .setClaims(claims)                                  // ⬅️ change is here
-                .setSubject(String.valueOf(user.getUserId()))        // main identity
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
+                .claims()
+                .add(claims)
+                .subject(String.valueOf(user.getUserId()))
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis()+jwtExpiration))
+                .and()
                 .signWith(getSecretKey())
                 .compact();
     }
 
-    //  Secret key builder
     private SecretKey getSecretKey() {
         byte[] keyBytes = secretKey.getBytes(StandardCharsets.UTF_8);
         return Keys.hmacShaKeyFor(keyBytes);

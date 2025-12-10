@@ -48,11 +48,11 @@ public class JwtReactiveAuthenticationManager implements ReactiveAuthenticationM
 
         Long userId = jwtTokenValidator.getSubjectAsLong(jwt);
         String username = jwtTokenValidator.getUsername(jwt);
-        List<String> roles = jwtTokenValidator.getRoles(jwt);
+        String role = jwtTokenValidator.getRole(jwt);
         String jti = Optional.ofNullable(jwt.getId()).orElse("");
 
         if (!introspectionEnabled) {
-            return Mono.just(buildSuccessAuth(userId, username, roles, jti, jwt.getClaims()));
+            return Mono.just(buildSuccessAuth(userId, username, role, jti, jwt.getClaims()));
         }
 
         //if introspect enabled, calls the authorization server to verify if the token is active
@@ -67,27 +67,24 @@ public class JwtReactiveAuthenticationManager implements ReactiveAuthenticationM
                     //if active extract remote claims
                     @SuppressWarnings("unchecked")
                     Map<String, Object> claims = (Map<String, Object>) map.get("claims");
-                    return Mono.just(buildSuccessAuth(userId, username, roles, jti, claims));
+                    return Mono.just(buildSuccessAuth(userId, username, role, jti, claims));
                 })
                 //if introspection unreachable fallback to local JWT validation
                 .onErrorResume(ex -> {
                     log.error("Introspection call failed: {}", ex.getMessage());
-                    return Mono.just(buildSuccessAuth(userId, username, roles, jti, jwt.getClaims()));
+                    return Mono.just(buildSuccessAuth(userId, username, role, jti, jwt.getClaims()));
                 });
     }
 
     //creating authentication object to store in security context
     private Authentication buildSuccessAuth(Long userId, String username,
-                                            List<String> roles, String jti,
+                                            String role, String jti,
                                             Map<String, Object> claims) {
-        List<SimpleGrantedAuthority> authorities = roles.stream()
-                .map(r -> r.startsWith("ROLE_") ? r : "ROLE_" + r)
-                .map(SimpleGrantedAuthority::new)
-                .toList();
-        var principal = new JwtAuthenticationPrincipal(userId, username, jti, claims);
+        List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(role.startsWith("ROLE_") ? role : "ROLE_" + role));
+        var principal = new JwtAuthenticationPrincipal(userId, username, role, jti, claims);
         return new UsernamePasswordAuthenticationToken(principal, null, authorities);
     }
 
-    public record JwtAuthenticationPrincipal(Long userId, String username, String jti, Map<String, Object> claims) {
+    public record JwtAuthenticationPrincipal(Long userId, String username, String role, String jti, Map<String, Object> claims) {
     }
 }

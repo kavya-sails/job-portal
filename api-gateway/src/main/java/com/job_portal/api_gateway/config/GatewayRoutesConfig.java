@@ -13,6 +13,10 @@ public class GatewayRoutesConfig {
     @Bean
     public RouteLocator customRoutes(RouteLocatorBuilder builder) {
         return builder.routes()
+                .route("user-route", r -> r
+                        .path("/api/users/**")
+                        .uri("lb://USER-SERVICE")
+                )
                 .build();
     }
 }

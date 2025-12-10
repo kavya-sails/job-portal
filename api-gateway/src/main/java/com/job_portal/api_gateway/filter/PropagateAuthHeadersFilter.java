@@ -25,6 +25,7 @@ public class PropagateAuthHeadersFilter implements WebFilter {
                     var mutated = exchange.getRequest().mutate()
                             .header("X-User-Id", String.valueOf(p.userId()))
                             .header("X-User-Username", p.username())
+                            .header("X-User-Role", String.join(",", p.role()))
                             .build();
 
                     //returns new request containing added headers

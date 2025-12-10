@@ -32,9 +32,8 @@ public class SecurityConfig {
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
                 .authorizeExchange(exchanges -> exchanges
-                        .pathMatchers("/api/auth/login", "/api/auth/register", "/actuator/**").permitAll()
-
-                        .pathMatchers(HttpMethod.POST, "/api/users").hasRole("ADMIN")
+                        .pathMatchers("/api/users/login", "/api/users/register", "/actuator/**").permitAll()
+                        .pathMatchers("/api/users").hasRole("ADMIN")
                         .anyExchange().authenticated()
                 )
                 // Ensure our auth filter runs at AUTHENTICATION order (before AUTHORIZATION)

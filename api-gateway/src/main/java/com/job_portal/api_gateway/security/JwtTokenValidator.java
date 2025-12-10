@@ -43,14 +43,8 @@ public class JwtTokenValidator {
 
     //roles claim can be in different formats depending on your user service
     @SuppressWarnings("unchecked")
-    public List<String> getRoles(Jwt jwt) {
-        Object roles = jwt.getClaims().get("roles");
-        return switch (roles) {
-            case null -> Collections.emptyList();
-            case List r -> (List<String>) roles;
-            case String s -> List.of(s.split(","));
-            default -> List.of(String.valueOf(roles));
-        };
+    public String getRole(Jwt jwt) {
+        return jwt.getClaims().get("role").toString();
     }
 }
 
