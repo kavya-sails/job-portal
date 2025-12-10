@@ -1,5 +1,7 @@
 package com.jobportal.user_service.entity;
 
+import com.jobportal.user_service.enums.ExperienceLevel;
+import com.jobportal.user_service.enums.JobRole;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -15,7 +17,6 @@ import java.time.LocalDateTime;
 @Builder
 public class UserProfile {
 
-    // Primary key (and DB-level FK to auth_users.user_id)
     @Id
     @Column(name = "id")
     private Long id;
@@ -28,8 +29,6 @@ public class UserProfile {
     @Column(name = "last_name", nullable = false, length = 50)
     private String lastName;
 
-    // No email here – comes from AuthUser
-
     @Column(name = "dob")
     private LocalDate dob;
 
@@ -39,27 +38,41 @@ public class UserProfile {
     @Column(name = "phone", length = 15)
     private String phone;
 
-    @Column(name = "highest_education", length = 100)
-    private String highestEducation;
-
     @Column(name = "skills", length = 500)
     private String skills;
 
     @Column(name = "experience")
     private Integer experience;
 
-    // -------------------- RESUME --------------------
+    @Enumerated(EnumType.STRING)
+    @Column(name = "job_role", length = 50)
+    private JobRole jobRole;
 
-    @Column(name = "resume_url", length = 100)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "experience_level", length = 50)
+    private ExperienceLevel experienceLevel;
+
+    @Column(name = "profile_completion_percentage")
+    private Integer profileCompletionPercentage;
+
+    // -------------------- RESUME & LINKS --------------------
+
+    @Column(name = "resume_url", length = 255)
     private String resumeUrl;
 
     @Column(name = "resume_uploaded_at")
     private LocalDateTime resumeUploadedAt;
 
-    // -------------------- STATUS --------------------
+    @Column(name = "portfolio_url", length = 255)
+    private String portfolioUrl;
 
-    @Column(name = "is_active", nullable = false)
-    private Boolean isActive;
+    @Column(name = "linkedin_url", length = 255)
+    private String linkedinUrl;
+
+    // -------------------- EDUCATION --------------------
+
+    @OneToOne(mappedBy = "userProfile", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private UserEducation education;
 
     // -------------------- AUDIT --------------------
 
@@ -76,10 +89,6 @@ public class UserProfile {
         LocalDateTime now = LocalDateTime.now();
         this.createdAt = now;
         this.updatedAt = now;
-
-        if (this.isActive == null) {
-            this.isActive = true;
-        }
     }
 
     @PreUpdate

@@ -8,7 +8,7 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/job_portal_user
     username: root
-    password: iiitn123
+    password: Pavan@2004
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   jpa:
@@ -27,13 +27,18 @@ spring:
       max-file-size: 2MB
       max-request-size: 2MB
 
-eureka:
-  client:
-    serverUrl:
-      defaultZone: http://localhost:8761/eureka
-  instance:
-    hostname: localhost
-    prefer-ip-address: true
+#eureka:
+#  client:
+#    serverUrl:
+#      defaultZone: http://localhost:8761/eureka
+#  instance:
+#    hostname: localhost
+#    prefer-ip-address: true
+logging:
+  level:
+    root: INFO
+    org.springframework.security: DEBUG
+    org.springframework.web: DEBUG
 
 security:
   jwt:
