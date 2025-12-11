@@ -5,7 +5,7 @@ VALUES
     ('ADMIN'),
     ('USER');
 
-INSERT INTO auth_users (email, password, role_id, is_active, created_at, updated_at)
+INSERT INTO credentials (email, password, role_id, is_active, created_at, updated_at)
 VALUES
 (
     'admin@jobportal.com',

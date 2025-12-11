@@ -19,8 +19,8 @@ CREATE TABLE user_profile (
     created_at                      DATETIME NOT NULL,
     updated_at                      DATETIME NOT NULL,
     PRIMARY KEY (id),
-    CONSTRAINT fk_user_profile_auth_user
+    CONSTRAINT fk_user_profile_credentials
         FOREIGN KEY (id)
-        REFERENCES auth_users (user_id)
+        REFERENCES credentials (user_id)
         ON DELETE CASCADE
 ) ENGINE=InnoDB;

@@ -3,7 +3,7 @@ package com.jobportal.user_service.service;
 import com.jobportal.user_service.dto.UserProfilePartialUpdateDto;
 import com.jobportal.user_service.dto.UserProfileRequestDto;
 import com.jobportal.user_service.dto.UserProfileResponseDto;
-import com.jobportal.user_service.entity.AuthUser;
+import com.jobportal.user_service.entity.UserCredential;
 import com.jobportal.user_service.entity.UserEducation;
 import com.jobportal.user_service.entity.UserProfile;
 import com.jobportal.user_service.exception.DataIntegrityViolationException;
@@ -12,8 +12,9 @@ import com.jobportal.user_service.exception.UserNotFound;
 import com.jobportal.user_service.exception.UserProfileNotFoundException;
 import com.jobportal.user_service.mapper.UserEducationMapper;
 import com.jobportal.user_service.mapper.UserProfileMapper;
+import com.jobportal.user_service.repository.UserCredentialRepository;
 import com.jobportal.user_service.repository.UserProfileRepository;
-import com.jobportal.user_service.repository.UserRepository;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +27,7 @@ import java.util.stream.Stream;
 public class UserProfileService {
 
     private final UserProfileRepository userProfileRepository;
-    private final UserRepository userRepository;
+    private final UserCredentialRepository userCredentialRepository;
     private final UserProfileMapper userProfileMapper;
     private final UserEducationMapper userEducationMapper; // <---- ADD THIS
 
@@ -40,7 +41,7 @@ public class UserProfileService {
             );
         }
         // Ensure AuthUser exists
-        AuthUser authUser = userRepository.findById(headerUserId)
+        UserCredential authUser = userCredentialRepository.findById(headerUserId)
                 .orElseThrow(() -> new UserNotFound(
                         "Auth user not found with id: " + headerUserId
                 ));
@@ -78,7 +79,7 @@ public class UserProfileService {
                         new UserProfileNotFoundException("User profile not found with id: " + pathId)
                 );
 
-        AuthUser authUser = userRepository.findById(pathId)
+        UserCredential authUser = userCredentialRepository.findById(pathId)
                 .orElseThrow(() -> new UserNotFound(
                         "Auth user not found with id: " + pathId
                 ));
@@ -96,7 +97,7 @@ public class UserProfileService {
 
         // Attach email for each profile from AuthUser
         for (UserProfileResponseDto resp : responseList) {
-            userRepository.findById(resp.getId()).ifPresent(
+            userCredentialRepository.findById(resp.getId()).ifPresent(
                     authUser -> resp.setEmail(authUser.getEmail())
             );
         }
@@ -135,7 +136,7 @@ public class UserProfileService {
                         new UserProfileNotFoundException("User profile not found with id: " + pathId)
                 );
 
-        AuthUser authUser = userRepository.findById(pathId)
+        UserCredential authUser = userCredentialRepository.findById(pathId)
                 .orElseThrow(() -> new UserNotFound(
                         "Auth user not found with id: " + pathId
                 ));
@@ -193,7 +194,7 @@ public class UserProfileService {
                         new UserProfileNotFoundException("User profile not found with id: " + pathId)
                 );
 
-        AuthUser authUser = userRepository.findById(pathId)
+        UserCredential authUser = userCredentialRepository.findById(pathId)
                 .orElseThrow(() -> new UserNotFound(
                         "Auth user not found with id: " + pathId
                 ));

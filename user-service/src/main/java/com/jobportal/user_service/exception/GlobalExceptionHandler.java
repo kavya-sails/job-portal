@@ -17,222 +17,135 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    // ---------- 404: UserProfile not found ----------
+    // ---------- 404: UserProfile Not Found ----------
     @ExceptionHandler(UserProfileNotFoundException.class)
-    public ResponseEntity<ExceptionResponse> handleUserProfileNotFound(UserProfileNotFoundException ex, HttpServletRequest req) {
-        ExceptionResponse response = new ExceptionResponse(
-                LocalDateTime.now(),
-                HttpStatus.NOT_FOUND.value(),
-                "User Profile Not Found",
-                ex.getMessage(),
-                req.getRequestURI()
-        );
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    public ResponseEntity<ExceptionResponse> handleUserProfileNotFound(
+            UserProfileNotFoundException ex,
+            HttpServletRequest req
+    ) {
+        return buildError(HttpStatus.NOT_FOUND, "User Profile Not Found", ex.getMessage(), req);
     }
 
-    // ---------- 404: Auth user not found ----------
+    // ---------- 404: Auth User Not Found ----------
     @ExceptionHandler(UserNotFound.class)
     public ResponseEntity<ExceptionResponse> handleUserNotFound(
             UserNotFound ex,
             HttpServletRequest req
     ) {
-        ExceptionResponse response = new ExceptionResponse(
-                LocalDateTime.now(),
-                HttpStatus.NOT_FOUND.value(),
-                "User Not Found",
-                ex.getMessage(),
-                req.getRequestURI()
-        );
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        return buildError(HttpStatus.NOT_FOUND, "User Not Found", ex.getMessage(), req);
     }
 
-    // ---------- 403: Forbidden (business access check) ----------
+    // ---------- 403: Forbidden ----------
     @ExceptionHandler(ForbiddenException.class)
-    public ResponseEntity<ExceptionResponse> handleForbidden(ForbiddenException ex, HttpServletRequest req) {
-        ExceptionResponse body = new ExceptionResponse(
-                LocalDateTime.now(),
-                HttpStatus.FORBIDDEN.value(),
-                "Forbidden",
-                ex.getMessage(),
-                req.getRequestURI()
-        );
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(body);
+    public ResponseEntity<ExceptionResponse> handleForbidden(
+            ForbiddenException ex,
+            HttpServletRequest req
+    ) {
+        return buildError(HttpStatus.FORBIDDEN, "Forbidden", ex.getMessage(), req);
     }
 
-/*    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ExceptionResponse> handleAll(Exception ex, WebRequest request) {
-        ex.printStackTrace();
-        ExceptionResponse err = new ExceptionResponse(LocalDateTime.now(),500, "Internal Server Error", ex.getMessage(), request.getDescription(false).replace("uri=",""));
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(err);
-    }*/
+    // ---------- 409: Data Integrity ----------
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ExceptionResponse> handleCustomDataIntegrityViolation(
+            DataIntegrityViolationException ex,
+            HttpServletRequest req
+    ) {
+        return buildError(HttpStatus.CONFLICT, "Conflict", ex.getMessage(), req);
+    }
 
-
+    // ---------- 400: @Valid errors ----------
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ExceptionResponse> handleValidationErrors(
             MethodArgumentNotValidException ex,
-            HttpServletRequest request
+            HttpServletRequest req
     ) {
-        String message = ex.getBindingResult()
-                .getFieldErrors()
+        String msg = ex.getBindingResult().getFieldErrors()
                 .stream()
-                .map(fieldError -> formatFieldError(fieldError))
+                .map(this::formatFieldError)
                 .collect(Collectors.joining(", "));
 
-        ExceptionResponse response = new ExceptionResponse(
-                LocalDateTime.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                "Validation Error",
-                message,
-                request.getRequestURI()
-        );
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        return buildError(HttpStatus.BAD_REQUEST, "Validation Error", msg, req);
     }
 
-    private String formatFieldError(FieldError fieldError) {
-        return fieldError.getField() + ": " + fieldError.getDefaultMessage();
+    private String formatFieldError(FieldError fe) {
+        return fe.getField() + ": " + fe.getDefaultMessage();
     }
 
-    // ---------- 400: @Validated on params / path variables ----------
+    // ---------- 400: Constraint Violations ----------
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ExceptionResponse> handleConstraintViolation(
             ConstraintViolationException ex,
-            HttpServletRequest request
+            HttpServletRequest req
     ) {
-        String message = ex.getConstraintViolations()
-                .stream()
+        String msg = ex.getConstraintViolations().stream()
                 .map(cv -> cv.getPropertyPath() + ": " + cv.getMessage())
                 .collect(Collectors.joining(", "));
 
-        ExceptionResponse response = new ExceptionResponse(
-                LocalDateTime.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                "Validation Error",
-                message,
-                request.getRequestURI()
-        );
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        return buildError(HttpStatus.BAD_REQUEST, "Validation Error", msg, req);
     }
 
-    // ---------- 400: Malformed JSON / invalid enum / invalid date / wrong type, etc. ----------
+    // ---------- 400: JSON Parsing / Enum / Date / Type errors ----------
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ExceptionResponse> handleHttpMessageNotReadable(
             HttpMessageNotReadableException ex,
-            HttpServletRequest request
+            HttpServletRequest req
     ) {
         String message;
-
         Throwable cause = ex.getMostSpecificCause();
 
         if (cause instanceof InvalidFormatException ife) {
-            Class<?> targetType = ife.getTargetType();
-
-            // Build JSON path: e.g. "education.passOutYear"
             String fieldPath = ife.getPath().stream()
-                    .map(ref -> ref.getFieldName() != null
-                            ? ref.getFieldName()
-                            : "[" + ref.getIndex() + "]")
+                    .map(ref -> ref.getFieldName() != null ? ref.getFieldName() : "[" + ref.getIndex() + "]")
                     .collect(Collectors.joining("."));
 
             String invalidValue = String.valueOf(ife.getValue());
+            Class<?> targetType = ife.getTargetType();
 
-            // Case 1: Enum field (JobRole, ExperienceLevel, EducationLevel, Specialisation...)
             if (targetType.isEnum()) {
-                String allowedValues = Arrays.stream(targetType.getEnumConstants())
+                String allowed = Arrays.stream(targetType.getEnumConstants())
                         .map(Object::toString)
                         .collect(Collectors.joining(", "));
+                message = String.format("Invalid value '%s' for '%s'. Allowed: %s", invalidValue, fieldPath, allowed);
 
-                message = String.format(
-                        "Invalid value '%s' for field '%s'. Allowed values are: %s",
-                        invalidValue,
-                        fieldPath,
-                        allowedValues
-                );
-
-                // Case 2: LocalDate parsing issue
             } else if (targetType.equals(LocalDate.class)) {
-                message = String.format(
-                        "Invalid date format for field '%s'. Please use 'YYYY-MM-DD'.",
-                        fieldPath
-                );
+                message = String.format("Invalid date for '%s'. Use YYYY-MM-DD", fieldPath);
 
-                // Case 3: Number types (Integer, Long, Double, etc.)
-            } else if (Number.class.isAssignableFrom(targetType)
-                    || targetType.isPrimitive()) {
-                message = String.format(
-                        "Invalid numeric value '%s' for field '%s'. Please provide a valid %s.",
-                        invalidValue,
-                        fieldPath,
-                        targetType.getSimpleName()
-                );
+            } else if (Number.class.isAssignableFrom(targetType) || targetType.isPrimitive()) {
+                message = String.format("Invalid number '%s' for '%s'. Expected %s",
+                        invalidValue, fieldPath, targetType.getSimpleName());
 
-                // Case 4: Boolean
-            } else if (targetType.equals(Boolean.class) || targetType.equals(boolean.class)) {
-                message = String.format(
-                        "Invalid boolean value '%s' for field '%s'. Expected true or false.",
-                        invalidValue,
-                        fieldPath
-                );
-
-                // Case 5: Generic type
             } else {
-                message = String.format(
-                        "Invalid value '%s' for field '%s'. Expected type: %s.",
-                        invalidValue,
-                        fieldPath,
-                        targetType.getSimpleName()
-                );
+                message = String.format("Invalid value '%s' for '%s'. Expected %s",
+                        invalidValue, fieldPath, targetType.getSimpleName());
             }
 
         } else if (cause instanceof JsonParseException jpe) {
-            // Low-level malformed JSON (e.g. missing comma, bad quotes)
-            message = "Malformed JSON request: " + jpe.getOriginalMessage();
+            message = "Malformed JSON: " + jpe.getOriginalMessage();
 
         } else if (cause instanceof JsonMappingException jme) {
-            // More generic mapping problem
             String fieldPath = jme.getPath().stream()
-                    .map(ref -> ref.getFieldName() != null
-                            ? ref.getFieldName()
-                            : "[" + ref.getIndex() + "]")
+                    .map(ref -> ref.getFieldName() != null ? ref.getFieldName() : "[" + ref.getIndex() + "]")
                     .collect(Collectors.joining("."));
-
-            message = String.format(
-                    "JSON mapping error for field '%s': %s",
-                    fieldPath,
-                    jme.getOriginalMessage()
-            );
+            message = String.format("JSON Mapping error in '%s': %s", fieldPath, jme.getOriginalMessage());
 
         } else {
-            // Fallback: generic malformed JSON
             message = "Malformed JSON request.";
         }
 
-        ExceptionResponse response = new ExceptionResponse(
-                LocalDateTime.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                "Invalid Request Body",
-                message,
-                request.getRequestURI()
-        );
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        return buildError(HttpStatus.BAD_REQUEST, "Invalid Request Body", message, req);
     }
 
-    // ---------- 400: Wrong type for query/path param ----------
+    // ---------- 400: Wrong type for query/path params ----------
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ExceptionResponse> handleTypeMismatch(
             MethodArgumentTypeMismatchException ex,
-            HttpServletRequest request
+            HttpServletRequest req
     ) {
         String message = String.format(
                 "Parameter '%s' must be of type %s",
@@ -240,86 +153,33 @@ public class GlobalExceptionHandler {
                 ex.getRequiredType() != null ? ex.getRequiredType().getSimpleName() : "unknown"
         );
 
-        ExceptionResponse response = new ExceptionResponse(
-                LocalDateTime.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                "Type Mismatch",
-                message,
-                request.getRequestURI()
-        );
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        return buildError(HttpStatus.BAD_REQUEST, "Type Mismatch", message, req);
     }
 
-    // ---------- 409: Data integrity / duplicate profile ----------
-    @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<ExceptionResponse> handleCustomDataIntegrityViolation(
-            DataIntegrityViolationException ex,
-            HttpServletRequest req
-    ) {
-        ExceptionResponse response = new ExceptionResponse(
-                LocalDateTime.now(),
-                HttpStatus.CONFLICT.value(),       // 409
-                "Conflict",
-                ex.getMessage(),
-                req.getRequestURI()
-        );
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
-    }
-
-    @ExceptionHandler(UserNotFound.class)
-    public ResponseEntity<Map<String, Object>> handleUserNotFound(UserNotFound ex) {
-
-        Map<String, Object> error = new HashMap<>();
-        error.put("timestamp", LocalDateTime.now());
-        error.put("status", HttpStatus.NOT_FOUND.value());
-        error.put("error", "User Not Found");
-        error.put("message", ex.getMessage());
-
-        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler(InvalidJobStatusException.class)
-    public ResponseEntity<Map<String, Object>> handleInvalidJobStatus(InvalidJobStatusException ex) {
-
-        Map<String, Object> error = new HashMap<>();
-        error.put("timestamp", LocalDateTime.now());
-        error.put("status", HttpStatus.BAD_REQUEST.value());
-        error.put("error", "Invalid Job Status");
-        error.put("message", ex.getMessage());
-
-        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
-    }
-
-    //  fallback handler
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, Object>> handleGeneralException(Exception ex) {
-
-        Map<String, Object> error = new HashMap<>();
-        error.put("timestamp", LocalDateTime.now());
-        error.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
-        error.put("error", "Internal Server Error");
-        error.put("message", ex.getMessage());
-
-        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    // ---------- 500: Fallback for unexpected errors ----------
+    // ---------- 500: fallback ----------
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ExceptionResponse> handleAll(
             Exception ex,
-            HttpServletRequest request
+            HttpServletRequest req
     ) {
-        ex.printStackTrace(); // for debugging
+        ex.printStackTrace();
+        return buildError(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error", ex.getMessage(), req);
+    }
 
-        ExceptionResponse err = new ExceptionResponse(
+    // ---------- Helper ----------
+    private ResponseEntity<ExceptionResponse> buildError(
+            HttpStatus status,
+            String error,
+            String message,
+            HttpServletRequest req
+    ) {
+        ExceptionResponse body = new ExceptionResponse(
                 LocalDateTime.now(),
-                HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                "Internal Server Error",
-                ex.getMessage(),
-                request.getRequestURI()
+                status.value(),
+                error,
+                message,
+                req.getRequestURI()
         );
-
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(err);
+        return ResponseEntity.status(status).body(body);
     }
 }

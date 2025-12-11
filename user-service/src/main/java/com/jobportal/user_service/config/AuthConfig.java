@@ -35,18 +35,34 @@ public class AuthConfig {
         return configuration.getAuthenticationManager();
     }
 
-    //  UserDetailsService (Fetch user from DB using EMAIL)
+//    //  UserDetailsService (Fetch user from DB using EMAIL)
+//    @Bean
+//    public UserDetailsService userDetailsService() {
+//        return username -> userCredentialRepository.findByEmail(username)
+//                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+//    }
+
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> userCredentialRepository.findByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
-    // ✅ 4️⃣ Authentication Provider (Core Auth Logic)
+//    //  Authentication Provider (Core Auth Logic)
+//    @Bean
+//    public AuthenticationProvider authenticationProvider() {
+//        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService());
+//        provider.setPasswordEncoder(passwordEncoder());
+//        return provider;
+//    }
+
     @Bean
     public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService());
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(userDetailsService());  // Manually set
         provider.setPasswordEncoder(passwordEncoder());
         return provider;
     }
+
+
 }
