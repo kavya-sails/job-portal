@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
+@RequiredArgsConstructor//(onConstructor_ = @Autowired)
 public class UserCredentialController {
 
     private final UserCredentialService userCredentialService;

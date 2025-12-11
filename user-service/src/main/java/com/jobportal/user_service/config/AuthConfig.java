@@ -16,7 +16,7 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
-@RequiredArgsConstructor(onConstructor = @__(@Autowired))
+@RequiredArgsConstructor
 public class AuthConfig {
 
     private final UserCredentialRepository userCredentialRepository;
@@ -41,8 +41,6 @@ public class AuthConfig {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
-
-
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
@@ -50,6 +48,5 @@ public class AuthConfig {
         provider.setPasswordEncoder(passwordEncoder());
         return provider;
     }
-
-
 }
+

@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
+@RequiredArgsConstructor//(onConstructor_ = @Autowired)
 public class UserCredentialService {
 
     private final UserCredentialRepository userCredentialRepository;

@@ -22,4 +22,5 @@ public class JobStatusListener {
         // Pass the message to your existing notification service
         notificationService.sendJobStatusNotification(message);
     }
+
 }

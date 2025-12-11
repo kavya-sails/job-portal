@@ -18,6 +18,7 @@ import com.jobportal.user_service.repository.UserProfileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -136,6 +137,8 @@ public class UserProfileService {
                         new UserProfileNotFoundException("User profile not found with id: " + pathId)
                 );
 
+        String oldResumeUrl = userProfile.getResumeUrl();
+
         UserCredential authUser = userCredentialRepository.findById(pathId)
                 .orElseThrow(() -> new UserNotFound(
                         "Auth user not found with id: " + pathId
@@ -160,6 +163,9 @@ public class UserProfileService {
                     );
                 }
             }
+
+            updateResumeTimestampIfChanged(oldResumeUrl, userProfile.getResumeUrl(), userProfile);
+
 
             recalculateProfileCompletion(userProfile);
 
@@ -194,6 +200,9 @@ public class UserProfileService {
                         new UserProfileNotFoundException("User profile not found with id: " + pathId)
                 );
 
+        String oldResumeUrl = userProfile.getResumeUrl();
+
+
         UserCredential authUser = userCredentialRepository.findById(pathId)
                 .orElseThrow(() -> new UserNotFound(
                         "Auth user not found with id: " + pathId
@@ -215,6 +224,9 @@ public class UserProfileService {
                     );
                 }
             }
+
+            updateResumeTimestampIfChanged(oldResumeUrl, userProfile.getResumeUrl(), userProfile);
+
 
             recalculateProfileCompletion(userProfile);
 
@@ -281,6 +293,12 @@ public class UserProfileService {
                 .count();
 
         return (int) Math.round((filled * 100.0) / total);
+    }
+
+    private void updateResumeTimestampIfChanged(String oldUrl, String newUrl, UserProfile profile) {
+        if (newUrl != null && !newUrl.equals(oldUrl)) {
+            profile.setResumeUploadedAt(LocalDateTime.now());
+        }
     }
 
 }
