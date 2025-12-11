@@ -6,6 +6,7 @@ import com.job_portal.job_service.entity.ApplicationEntity;
 import com.job_portal.job_service.entity.ApplicationStatus;
 import com.job_portal.job_service.entity.JobEntity;
 import com.job_portal.job_service.exception.ApplicationConflictException;
+import com.job_portal.job_service.exception.ApplicationNotFoundException;
 import com.job_portal.job_service.exception.JobNotFoundException;
 import com.job_portal.job_service.mapper.ApplicationCommandMapper;
 import com.job_portal.job_service.repository.command.ApplicationCommandRepository;
@@ -45,7 +46,7 @@ public class ApplicationCommandService {
     @Transactional
     public ApplicationStatusResponseDto updateStatus(Long applicationId, ApplicationStatus newStatus) {
         ApplicationEntity app = applicationCommandRepository.findById(applicationId)
-                .orElseThrow(() -> new RuntimeException("Application not found: " + applicationId));
+                .orElseThrow(() -> new ApplicationNotFoundException(applicationId));
 
         app.setStatus(newStatus);
         ApplicationEntity updated = applicationCommandRepository.save(app);
