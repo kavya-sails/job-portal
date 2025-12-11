@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMQConfig {
 
-    public static final String JOB_STATUS_QUEUE = "job-status-queue";
+    public static final String JOB_STATUS_QUEUE = "job_application_status";
     public static final String JOB_EXCHANGE = "job-events-exchange";
     public static final String JOB_ROUTING_KEY = "job.status.updated";
 
@@ -44,10 +44,6 @@ public class RabbitMQConfig {
         return new Jackson2JsonMessageConverter();
     }
 
-
-    // ------------------------------------------
-    //  RABBIT LISTENER FACTORY WITH JSON SUPPORT
-    // ------------------------------------------
     @Bean
     public SimpleRabbitListenerContainerFactory rabbitListenerContainerFactory(
             ConnectionFactory connectionFactory,

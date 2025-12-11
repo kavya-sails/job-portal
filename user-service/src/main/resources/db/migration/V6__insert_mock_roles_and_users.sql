@@ -3,7 +3,7 @@
 INSERT INTO roles (role_name)
 VALUES
     ('ADMIN'),
-    ('RECRUITER')
+    ('RECRUITER'),
     ('USER');
 
 INSERT INTO credentials (email, password, role_id, is_active, created_at, updated_at)
