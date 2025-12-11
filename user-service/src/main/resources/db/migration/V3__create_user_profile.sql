@@ -1,5 +1,3 @@
--- V3__create_user_profile.sql
-
 CREATE TABLE user_profile (
     id                              BIGINT NOT NULL,
     first_name                      VARCHAR(50) NOT NULL,

@@ -7,19 +7,16 @@ import com.jobportal.user_service.entity.Role;
 import com.jobportal.user_service.repository.UserCredentialRepository;
 import com.jobportal.user_service.repository.RoleRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor//(onConstructor_ = @Autowired)
+@RequiredArgsConstructor
 public class UserCredentialService {
-
     private final UserCredentialRepository userCredentialRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
@@ -30,7 +27,7 @@ public class UserCredentialService {
         if (userCredentialRepository.existsByEmail(request.getEmail())) {
             return "Email already exists";
         }
-        Role role = roleRepository.findByRoleName("USER")
+        Role role = roleRepository.findByRoleName(request.getRoleName())
                 .orElseThrow(() -> new RuntimeException("Role not found"));
 
         UserCredential user = new UserCredential();

@@ -188,7 +188,6 @@ public class UserProfileService {
 
 
     public UserProfileResponseDto partialUpdateUserProfile(Long pathId, Long headerUserId, UserProfilePartialUpdateDto dto) {
-
         if (!pathId.equals(headerUserId)) {
             throw new ForbiddenException(
                     "You are not allowed to update this profile"

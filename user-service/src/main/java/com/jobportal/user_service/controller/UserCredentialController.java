@@ -6,16 +6,14 @@ import com.jobportal.user_service.entity.UserCredential;
 import com.jobportal.user_service.service.UserCredentialService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
-@RequiredArgsConstructor//(onConstructor_ = @Autowired)
+@RequiredArgsConstructor
 public class UserCredentialController {
-
     private final UserCredentialService userCredentialService;
 
     @PostMapping("/register")

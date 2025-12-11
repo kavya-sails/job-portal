@@ -1,2 +1,0 @@
--- V4__alter_user_profile_add_new_fields.sql
--- No-op: user_profile already created with final structure in V3.
