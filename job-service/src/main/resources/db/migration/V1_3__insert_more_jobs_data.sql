@@ -1,54 +1,53 @@
-INSERT INTO jobs (title, description, location, experience_required, posted_date)
+INSERT INTO jobs (
+    title, description, location, experience_required,
+    company_name, package_offered, skills, education, posted_date
+)
 VALUES
--- SDE levels
-('SDE1', 'Entry-level software engineer.', 'Hyderabad', 0, CURRENT_TIMESTAMP),
-('SDE2', 'Mid-level software engineer.', 'Bengaluru', 2, CURRENT_TIMESTAMP),
-('SDE3', 'Senior software engineer.', 'Pune', 4, CURRENT_TIMESTAMP),
+('Machine Learning Intern',
+'Support ML team in building models, annotating datasets, and performing exploratory analysis.',
+'Hyderabad', 0,
+'TCS', '3 LPA',
+'Python, NumPy, Pandas, Basic ML Algorithms',
+'B.Tech / B.Sc', NOW()),
 
--- DevOps roles
-('DevOps L1', 'Basic CI/CD & Linux skills.', 'Hyderabad', 1, CURRENT_TIMESTAMP),
-('DevOps L2', 'CI/CD, Docker, Kubernetes.', 'Bengaluru', 3, CURRENT_TIMESTAMP),
-('DevOps L3', 'K8s, Terraform, AWS expert.', 'Chennai', 5, CURRENT_TIMESTAMP),
+('Junior Machine Learning Engineer',
+'Implement ML models, collaborate with data engineers, and optimize training pipelines.',
+'Bengaluru', 1,
+'Infosys', '6 LPA',
+'Python, Scikit-learn, Data Preprocessing, Jupyter Notebooks',
+'B.Tech / M.Sc', NOW()),
 
--- QA roles
-('QA Manual', 'Manual test cases & functional testing.', 'Noida', 1, CURRENT_TIMESTAMP),
-('QA Automation', 'Selenium, TestNG, Cypress.', 'Hyderabad', 2, CURRENT_TIMESTAMP),
-('QA Lead', 'Lead QA team, strategy & planning.', 'Remote', 5, CURRENT_TIMESTAMP),
+('Computer Vision Engineer',
+'Build deep learning models for image classification and object detection.',
+'Chennai', 3,
+'NVIDIA', '22 LPA',
+'OpenCV, PyTorch, CNNs, YOLO, Image Processing',
+'B.Tech / M.Tech', NOW()),
 
--- Data roles
-('Data Analyst', 'SQL, dashboards, reporting.', 'Gurgaon', 1, CURRENT_TIMESTAMP),
-('Data Engineer L1', 'ETL pipelines, Python.', 'Pune', 2, CURRENT_TIMESTAMP),
-('Data Engineer L2', 'Big Data, Spark, Airflow.', 'Hyderabad', 4, CURRENT_TIMESTAMP),
-('Data Scientist L2', 'ML models & experimentation.', 'Bengaluru', 3, CURRENT_TIMESTAMP),
+('NLP Engineer',
+'Develop NLP models for classification, summarization, and sentiment analysis.',
+'Remote', 2,
+'Google', '28 LPA',
+'Transformers, HuggingFace, Python, NLTK, BERT/GPT',
+'B.Tech / M.Tech', NOW()),
 
--- Backend roles
-('Java Dev L1', 'Spring Boot basics.', 'Hyderabad', 1, CURRENT_TIMESTAMP),
-('Java Dev L2', 'Microservices & REST APIs.', 'Chennai', 3, CURRENT_TIMESTAMP),
-('NodeJS Dev', 'APIs with Express.js.', 'Remote', 2, CURRENT_TIMESTAMP),
-('Python Backend', 'FastAPI, Django APIs.', 'Kochi', 2, CURRENT_TIMESTAMP),
+('Senior Machine Learning Engineer',
+'Design ML architectures, deploy pipelines, and lead ML optimization.',
+'Bengaluru', 5,
+'Amazon', '40 LPA',
+'Python, TensorFlow, MLFlow, Airflow, Distributed Training',
+'B.Tech / M.Tech', NOW()),
 
--- Frontend roles
-('React Dev', 'React, Redux, TypeScript.', 'Hyderabad', 2, CURRENT_TIMESTAMP),
-('Angular Dev', 'Angular + RxJS.', 'Bengaluru', 3, CURRENT_TIMESTAMP),
-('UI Engineer', 'HTML, CSS, JS.', 'Pune', 1, CURRENT_TIMESTAMP),
+('Deep Learning Researcher',
+'Research and develop state-of-the-art deep learning methods.',
+'Hyderabad', 3,
+'OpenAI', '45 LPA',
+'PyTorch, LLMs, Transformers, Reinforcement Learning',
+'Ph.D / M.Tech', NOW()),
 
--- Cloud / Infra roles
-('AWS Engineer', 'AWS EC2, S3, Lambda.', 'Chennai', 3, CURRENT_TIMESTAMP),
-('Azure Engineer', 'Azure DevOps, Functions.', 'Hyderabad', 3, CURRENT_TIMESTAMP),
-('GCP Engineer', 'GCP services & IAM.', 'Gurgaon', 3, CURRENT_TIMESTAMP),
-
--- Security roles
-('Security Analyst', 'SOC monitoring, SIEM.', 'Bengaluru', 1, CURRENT_TIMESTAMP),
-('Pen Tester', 'VAPT, Kali Linux.', 'Hyderabad', 2, CURRENT_TIMESTAMP),
-
--- Mobile roles
-('Android Dev', 'Kotlin, Jetpack.', 'Pune', 1, CURRENT_TIMESTAMP),
-('iOS Dev', 'Swift, Xcode.', 'Chennai', 2, CURRENT_TIMESTAMP),
-
--- Database roles
-('DBA Junior', 'MySQL/Postgres basics.', 'Hyderabad', 1, CURRENT_TIMESTAMP),
-('DBA Senior', 'DB tuning, replication.', 'Bengaluru', 5, CURRENT_TIMESTAMP),
-
--- Management roles
-('Tech Lead', 'Lead development team.', 'Remote', 6, CURRENT_TIMESTAMP),
-('Project Manager', 'Manage SCRUM & delivery.', 'Hyderabad', 7, CURRENT_TIMESTAMP);
+('Data Scientist - GenAI',
+'Build and fine-tune generative AI models and vector search systems.',
+'Pune', 4,
+'Microsoft', '38 LPA',
+'LLMs, LangChain, Vector Databases, Python, Prompt Engineering',
+'B.Tech / M.Tech / Ph.D', NOW());
