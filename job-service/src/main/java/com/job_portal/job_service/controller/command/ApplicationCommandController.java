@@ -3,6 +3,7 @@ package com.job_portal.job_service.controller.command;
 import com.job_portal.job_service.dto.command.ApplicationStatusResponseDto;
 import com.job_portal.job_service.dto.command.ApplicationStatusUpdateDto;
 import com.job_portal.job_service.dto.query.ApplicationHistoryQueryDto;
+import com.job_portal.job_service.exception.BadRequestException;
 import com.job_portal.job_service.service.command.ApplicationCommandService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +22,8 @@ public class ApplicationCommandController
             @RequestHeader("X-User-Id") String userId)
     {
         if (!StringUtils.hasText(userId)) {
-            return ResponseEntity.badRequest().build();
+            throw new BadRequestException("Missing or empty X-User-Id header");
+//            return ResponseEntity.badRequest().build();
         }
         ApplicationHistoryQueryDto dto = commandService.apply(userId, jobId);
         return ResponseEntity.ok(dto);
