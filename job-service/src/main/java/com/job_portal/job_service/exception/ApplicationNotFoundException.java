@@ -1,11 +1,7 @@
 package com.job_portal.job_service.exception;
 
-import com.job_portal.job_service.exception.Enum.ErrorCode;
-
-public class ApplicationNotFoundException extends BaseAppException {
+public class ApplicationNotFoundException extends RuntimeException {
     public ApplicationNotFoundException(Long applicationId) {
-        super(ErrorCode.BAD_REQUEST,
-                "Application not found: " + applicationId,
-                "No application exists with id = " + applicationId);
+        super("Application not found with ID: " + applicationId);
     }
 }

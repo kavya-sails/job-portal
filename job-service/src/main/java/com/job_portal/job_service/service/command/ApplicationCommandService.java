@@ -9,6 +9,7 @@ import com.job_portal.job_service.entity.JobEntity;
 import com.job_portal.job_service.exception.ApplicationConflictException;
 import com.job_portal.job_service.exception.ApplicationNotFoundException;
 import com.job_portal.job_service.exception.JobNotFoundException;
+import com.job_portal.job_service.exception.MessagePublishException;
 import com.job_portal.job_service.mapper.ApplicationCommandMapper;
 import com.job_portal.job_service.publisher.ApplicationStatusPublisher;
 import com.job_portal.job_service.repository.command.ApplicationCommandRepository;
@@ -33,7 +34,7 @@ public class ApplicationCommandService {
 
         applicationCommandRepository.findByJobJobIdAndUserId(jobId, userId)
                 .ifPresent(a -> {
-                    throw new ApplicationConflictException("User already applied to this job");
+                    throw new ApplicationConflictException(jobId, userId);
                 });
 
         ApplicationEntity app = ApplicationEntity.builder()
@@ -62,8 +63,11 @@ public class ApplicationCommandService {
                 .status(updated.getStatus())
                 .build();
 
-        // Publish event
-        statusPublisher.publish(event);
+        try {
+            statusPublisher.publish(event);
+        } catch (Exception e) {
+            throw new MessagePublishException(e.getMessage());
+        }
 
         return ApplicationCommandMapper.toStatusResponse(updated);
     }
