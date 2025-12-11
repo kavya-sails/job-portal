@@ -2,9 +2,9 @@ package com.job_portal.job_service.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-        import lombok.*;
+import lombok.*;
+import java.time.Instant;
 
-        import java.time.Instant;
 @Entity
 @Table(name = "applications",
         uniqueConstraints = @UniqueConstraint(columnNames = {"job_id", "user_id"}))
