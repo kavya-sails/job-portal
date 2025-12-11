@@ -9,8 +9,12 @@ import lombok.Data;
 @Data
 public class RegisterRequest {
 
-    @NotBlank(message = "Email is required")
-    @Email(message = "Please provide a valid email address")
+    @NotBlank(message = "Email is mandatory")
+    @Email(message = "Enter a valid email address")
+    @Pattern(
+            regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$",
+            message = "Email must be a valid format (e.g., user@example.com)"
+    )
     private String email;
 
     @NotBlank(message = "Password is required")
