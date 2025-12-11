@@ -30,6 +30,10 @@ public class JobCommandService {
                 .description(dto.getDescription())
                 .location(dto.getLocation())
                 .experienceRequired(dto.getExperienceRequired())
+                .companyName(dto.getCompanyName())
+                .packageOffered(dto.getPackageOffered())
+                .skills(dto.getSkills())
+                .education(dto.getEducation())
                 .postedDate(posted)
                 .expiresAt(expiresAt)
                 .build();
@@ -42,6 +46,12 @@ public class JobCommandService {
         if (dto.getDescription() != null) job.setDescription(dto.getDescription());
         if (dto.getLocation() != null) job.setLocation(dto.getLocation());
         if (dto.getExperienceRequired() != null) job.setExperienceRequired(dto.getExperienceRequired());
+
+        // new fields
+        if (dto.getCompanyName() != null) job.setCompanyName(dto.getCompanyName());
+        if (dto.getPackageOffered() != null) job.setPackageOffered(dto.getPackageOffered());
+        if (dto.getSkills() != null) job.setSkills(dto.getSkills());
+        if (dto.getEducation() != null) job.setEducation(dto.getEducation());
 
         // If admin provided a postedDate, update it
         if (dto.getPostedDate() != null) {

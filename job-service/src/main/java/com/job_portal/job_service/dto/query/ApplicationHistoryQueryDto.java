@@ -15,6 +15,7 @@ public class ApplicationHistoryQueryDto {
     private Long applicationId;
     private Long jobId;
     private String jobTitle;
+    private String companyName;
     private Instant appliedDate;
     private ApplicationStatus status;
 }

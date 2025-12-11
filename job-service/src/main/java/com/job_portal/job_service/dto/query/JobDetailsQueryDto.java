@@ -13,6 +13,12 @@ public class JobDetailsQueryDto {
     private String description;
     private String location;
     private Integer experienceRequired;
+
+    private String companyName;
+    private String packageOffered;
+    private String skills;
+    private String education;
+
     private Instant postedDate;
     private Instant expiresAt;
 }

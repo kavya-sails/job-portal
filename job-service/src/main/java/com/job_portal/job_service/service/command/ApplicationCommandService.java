@@ -30,6 +30,7 @@ public class ApplicationCommandService {
         ApplicationEntity app = ApplicationEntity.builder()
                 .job(job)
                 .userId(userId)
+                .companyName(job.getCompanyName())
                 .appliedDate(Instant.now())
                 .status(ApplicationStatus.PENDING)
                 .build();

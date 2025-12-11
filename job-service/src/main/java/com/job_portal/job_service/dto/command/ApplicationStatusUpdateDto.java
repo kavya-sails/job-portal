@@ -9,6 +9,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class ApplicationStatusUpdateDto {
-    @NotNull
+
+    @NotNull(message = "Status cannot be null")
     private ApplicationStatus status;
 }
