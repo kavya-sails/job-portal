@@ -4,7 +4,6 @@ import com.job_portal.job_service.dto.query.JobSearchCriteria;
 import com.job_portal.job_service.entity.JobEntity;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
-
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +13,6 @@ public class JobSpecification {
     public static Specification<JobEntity> withFilters(JobSearchCriteria c) {
 
         return (root, query, cb) -> {
-
             List<Predicate> predicates = new ArrayList<>();
 
             if (hasText(c.getTitle())) {
@@ -54,7 +52,6 @@ public class JobSpecification {
                             cb.greaterThan(root.get("expiresAt"), Instant.now())
                     )
             );
-
             return cb.and(predicates.toArray(new Predicate[0]));
         };
     }

@@ -31,7 +31,7 @@ public class ApplicationCommandController
 
     // Update application status
     @PutMapping("/{applicationId}/status")
-    public ResponseEntity<?> updateStatus(
+    public ResponseEntity<ApplicationStatusResponseDto> updateStatus(
             @PathVariable Long applicationId,
             @RequestBody ApplicationStatusUpdateDto dto)
     {
