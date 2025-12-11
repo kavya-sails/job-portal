@@ -3,22 +3,26 @@ package com.jobportal.user_service.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
 
 @Entity
-@Table(name = "auth_users")
+@Table(name = "credentials")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AuthUser {
+public class UserCredential implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
 
-    //  Login Credentials
     @Column(nullable = false, unique = true)
     @Email
     private String email;
@@ -26,26 +30,22 @@ public class AuthUser {
     @Column(nullable = false)
     private String password;
 
-    //  Role Mapping
     @ManyToOne
     @JoinColumn(name = "role_id", nullable = false)
     private Role role;
 
-    //  Account Status
     private Boolean isActive = true;
 
-    //  Audit
+    @CreationTimestamp
     private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
 
-    @PrePersist
-    public void onCreate() {
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of();
     }
 
-    @PreUpdate
-    public void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
+    @Override
+    public String getUsername() {
+        return email;
     }
 }

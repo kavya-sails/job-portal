@@ -1,7 +1,7 @@
 package com.jobportal.user_service.controller;
 
-import com.jobportal.user_service.entity.AuthUser;
-import com.jobportal.user_service.repository.UserRepository;
+import com.jobportal.user_service.entity.UserCredential;
+import com.jobportal.user_service.repository.UserCredentialRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -22,7 +22,7 @@ import java.util.Map;
 public class AuthIntrospectionController {
 
     private final JwtDecoder jwtDecoder;
-    private final UserRepository userRepository;
+    private final UserCredentialRepository userCredentialRepository;
 
     @GetMapping("/introspect")
     public ResponseEntity<Map<String,Object>> introspect(@RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String authorization) {
@@ -39,7 +39,7 @@ public class AuthIntrospectionController {
             Jwt jwt = jwtDecoder.decode(token);
             String sub = jwt.getSubject();
             Long userId = Long.valueOf(sub);
-            boolean userOk = userRepository.findById(userId).map(AuthUser::getIsActive).orElse(false);
+            boolean userOk = userCredentialRepository.findById(userId).map(UserCredential::getIsActive).orElse(false);
             if (!userOk) {
                 resp.put(active, false);
                 resp.put(error, "user_not_found_or_disabled");

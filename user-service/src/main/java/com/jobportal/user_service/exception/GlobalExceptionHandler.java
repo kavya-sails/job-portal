@@ -10,24 +10,23 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
-@RestControllerAdvice
+@ControllerAdvice
 public class GlobalExceptionHandler {
 
     // ---------- 404: UserProfile not found ----------
     @ExceptionHandler(UserProfileNotFoundException.class)
-    public ResponseEntity<ExceptionResponse> handleUserProfileNotFound(
-            UserProfileNotFoundException ex,
-            HttpServletRequest req
-    ) {
+    public ResponseEntity<ExceptionResponse> handleUserProfileNotFound(UserProfileNotFoundException ex, HttpServletRequest req) {
         ExceptionResponse response = new ExceptionResponse(
                 LocalDateTime.now(),
                 HttpStatus.NOT_FOUND.value(),
@@ -58,10 +57,7 @@ public class GlobalExceptionHandler {
 
     // ---------- 403: Forbidden (business access check) ----------
     @ExceptionHandler(ForbiddenException.class)
-    public ResponseEntity<ExceptionResponse> handleForbidden(
-            ForbiddenException ex,
-            HttpServletRequest req
-    ) {
+    public ResponseEntity<ExceptionResponse> handleForbidden(ForbiddenException ex, HttpServletRequest req) {
         ExceptionResponse body = new ExceptionResponse(
                 LocalDateTime.now(),
                 HttpStatus.FORBIDDEN.value(),
@@ -72,13 +68,19 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(body);
     }
 
-    // ---------- 400: @Valid @RequestBody (DTO validation) ----------
+/*    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ExceptionResponse> handleAll(Exception ex, WebRequest request) {
+        ex.printStackTrace();
+        ExceptionResponse err = new ExceptionResponse(LocalDateTime.now(),500, "Internal Server Error", ex.getMessage(), request.getDescription(false).replace("uri=",""));
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(err);
+    }*/
+
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ExceptionResponse> handleValidationErrors(
             MethodArgumentNotValidException ex,
             HttpServletRequest request
     ) {
-        // collect ALL validation errors (Bean Validation)
         String message = ex.getBindingResult()
                 .getFieldErrors()
                 .stream()
@@ -263,6 +265,43 @@ public class GlobalExceptionHandler {
                 req.getRequestURI()
         );
         return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
+
+    @ExceptionHandler(UserNotFound.class)
+    public ResponseEntity<Map<String, Object>> handleUserNotFound(UserNotFound ex) {
+
+        Map<String, Object> error = new HashMap<>();
+        error.put("timestamp", LocalDateTime.now());
+        error.put("status", HttpStatus.NOT_FOUND.value());
+        error.put("error", "User Not Found");
+        error.put("message", ex.getMessage());
+
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(InvalidJobStatusException.class)
+    public ResponseEntity<Map<String, Object>> handleInvalidJobStatus(InvalidJobStatusException ex) {
+
+        Map<String, Object> error = new HashMap<>();
+        error.put("timestamp", LocalDateTime.now());
+        error.put("status", HttpStatus.BAD_REQUEST.value());
+        error.put("error", "Invalid Job Status");
+        error.put("message", ex.getMessage());
+
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    //  fallback handler
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, Object>> handleGeneralException(Exception ex) {
+
+        Map<String, Object> error = new HashMap<>();
+        error.put("timestamp", LocalDateTime.now());
+        error.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
+        error.put("error", "Internal Server Error");
+        error.put("message", ex.getMessage());
+
+        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     // ---------- 500: Fallback for unexpected errors ----------
