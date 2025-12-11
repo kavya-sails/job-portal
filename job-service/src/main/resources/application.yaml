@@ -11,7 +11,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/jobdb
     username: postgres
-    password: 12345678     # quote the password
+    password: admin    # quote the password
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -28,17 +28,22 @@ spring:
     locations: classpath:db/migration
     baseline-on-migrate: true
 
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
 eureka:                        # moved out from under flyway
   client:
-    register-with-eureka: true
-    fetch-registry: true
-    serverUrl:
-      defaultZone: http://localhost:8761/eureka
+    register-with-eureka: false
+    fetch-registry: false
+
 
 server:
   port: 8001
 
-logging:
-  level:
-    root: INFO
-    org.hibernate.SQL: DEBUG
+#logging:
+#  level:
+#    root: INFO
+#    org.hibernate.SQL: DEBUG

@@ -1,6 +1,7 @@
 package com.job_portal.job_service.service.command;
 
 import com.job_portal.job_service.dto.command.ApplicationStatusResponseDto;
+import com.job_portal.job_service.dto.event.ApplicationStatusEvent;
 import com.job_portal.job_service.dto.query.ApplicationHistoryQueryDto;
 import com.job_portal.job_service.entity.ApplicationEntity;
 import com.job_portal.job_service.entity.ApplicationStatus;
@@ -8,6 +9,7 @@ import com.job_portal.job_service.entity.JobEntity;
 import com.job_portal.job_service.exception.ApplicationConflictException;
 import com.job_portal.job_service.exception.JobNotFoundException;
 import com.job_portal.job_service.mapper.ApplicationCommandMapper;
+import com.job_portal.job_service.publisher.ApplicationStatusPublisher;
 import com.job_portal.job_service.repository.command.ApplicationCommandRepository;
 import com.job_portal.job_service.repository.query.JobQueryRepository;
 import jakarta.transaction.Transactional;
@@ -20,6 +22,7 @@ import java.time.Instant;
 public class ApplicationCommandService {
     private final ApplicationCommandRepository applicationCommandRepository;
     private final JobQueryRepository jobQueryRepository;
+    private final ApplicationStatusPublisher statusPublisher;
 
     @Transactional
     public ApplicationHistoryQueryDto apply(String userId, Long jobId) {
@@ -49,6 +52,17 @@ public class ApplicationCommandService {
 
         app.setStatus(newStatus);
         ApplicationEntity updated = applicationCommandRepository.save(app);
+        ApplicationStatusEvent event = ApplicationStatusEvent.builder()
+                .applicationId(updated.getApplicationId())
+                .userId(updated.getUserId())
+                .jobId(updated.getJob().getJobId())
+                .jobTitle(updated.getJob().getTitle())
+                .status(updated.getStatus())
+                .build();
+
+        // Publish event
+        statusPublisher.publish(event);
+
         return ApplicationCommandMapper.toStatusResponse(updated);
     }
 }
