@@ -10,10 +10,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ExceptionResponse {
+
     private LocalDateTime timeStamp;
     private int status;
     private String error;
     private String message;
     private String path;
-
 }

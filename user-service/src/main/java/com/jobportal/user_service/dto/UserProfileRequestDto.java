@@ -1,5 +1,8 @@
 package com.jobportal.user_service.dto;
 
+import com.jobportal.user_service.enums.ExperienceLevel;
+import com.jobportal.user_service.enums.JobRole;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
@@ -10,7 +13,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserRequestDto {
+public class UserProfileRequestDto {
 
     @NotBlank(message = "First name is required")
     @Size(min = 2, max = 50, message = "First name must be between 2 and 50 characters")
@@ -28,28 +31,22 @@ public class UserRequestDto {
     )
     private String lastName;
 
-/*    @NotBlank(message = "Email is required")
-    @Email(message = "Invalid email format")
-    private String email;*/
-
     @NotNull(message = "Date of birth is required")
     @Past(message = "Date of birth must be in the past")
     private LocalDate dob;
 
+    // OPTIONAL
     @Size(max = 255, message = "Address must not exceed 255 characters")
     private String address;
 
     @NotBlank(message = "Phone number is required")
     @Pattern(
-            // 10–15 digits AND not all the same digit (e.g. 1111111111, 0000000000)
             regexp = "^(?!([0-9])\\1{9,14})[0-9]{10,15}$",
             message = "Phone number must be 10–15 digits and not all the same digit"
     )
     private String phone;
 
-    @Size(max = 100, message = "Highest education must not exceed 100 characters")
-    private String highestEducation;
-
+    // OPTIONAL
     @Size(max = 500, message = "Skills must not exceed 500 characters")
     @Pattern(
             regexp = "^[^,]+(,[^,]+)*$",
@@ -60,11 +57,37 @@ public class UserRequestDto {
     @NotNull(message = "Experience is required")
     @Min(value = 0, message = "Experience cannot be negative")
     @Max(value = 50, message = "Experience cannot exceed 50 years")
-    private Integer experience;
+    private Integer experience; // in years
 
+    @NotNull(message = "Job role is required")
+    private JobRole jobRole;
+
+    @NotNull(message = "Experience level is required")
+    private ExperienceLevel experienceLevel;
+
+    // REQUIRED & must be URL
+    @NotBlank(message = "Resume URL is required")
     @Pattern(
             regexp = "^(http|https)://.*$",
             message = "Resume URL must be a valid URL"
     )
     private String resumeUrl;
+
+    // OPTIONAL
+    @Pattern(
+            regexp = "^(http|https)://.*$",
+            message = "Portfolio URL must be a valid URL"
+    )
+    private String portfolioUrl;
+
+    // OPTIONAL
+    @Pattern(
+            regexp = "^(http|https)://.*$",
+            message = "LinkedIn URL must be a valid URL"
+    )
+    private String linkedinUrl;
+
+    @Valid
+    @NotNull(message = "Education details are required")
+    private EducationDto education;
 }

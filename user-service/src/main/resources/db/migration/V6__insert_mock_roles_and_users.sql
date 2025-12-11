@@ -1,4 +1,4 @@
--- V4__insert_mock_roles_and_users.sql
+-- V6__insert_mock_roles_and_users.sql
 
 INSERT INTO roles (role_name)
 VALUES
@@ -6,7 +6,7 @@ VALUES
     ('RECRUITER')
     ('USER');
 
-INSERT INTO auth_users (email, password, role_id, is_active, created_at, updated_at)
+INSERT INTO credentials (email, password, role_id, is_active, created_at, updated_at)
 VALUES
 (
     'admin@jobportal.com',

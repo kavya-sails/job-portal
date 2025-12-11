@@ -1,91 +1,200 @@
 package com.jobportal.user_service.exception;
 
-
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    // ---------- 404: UserProfile Not Found ----------
     @ExceptionHandler(UserProfileNotFoundException.class)
-    public ResponseEntity<ExceptionResponse> handleUserProfileNotFound(UserProfileNotFoundException ex, HttpServletRequest req) {
-        ExceptionResponse response = new ExceptionResponse(
-                LocalDateTime.now(),
-                HttpStatus.NOT_FOUND.value(),
-                "User Profile Not Found",
-                ex.getMessage(),
-                req.getRequestURI()
-        );
-
-        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler(ForbiddenException.class)
-    public ResponseEntity<ExceptionResponse> handleForbidden(ForbiddenException ex, HttpServletRequest req) {
-        ExceptionResponse body = new ExceptionResponse(
-                LocalDateTime.now(),
-                HttpStatus.FORBIDDEN.value(),
-                "Forbidden",
-                ex.getMessage(),
-                req.getRequestURI()
-        );
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(body);
-    }
-
-/*    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ExceptionResponse> handleAll(Exception ex, WebRequest request) {
-        ex.printStackTrace();
-        ExceptionResponse err = new ExceptionResponse(LocalDateTime.now(),500, "Internal Server Error", ex.getMessage(), request.getDescription(false).replace("uri=",""));
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(err);
-    }*/
-
-
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ExceptionResponse> handleValidationErrors(
-            MethodArgumentNotValidException ex,
-            HttpServletRequest request
+    public ResponseEntity<ExceptionResponse> handleUserProfileNotFound(
+            UserProfileNotFoundException ex,
+            HttpServletRequest req
     ) {
-        String message = ex.getBindingResult()
-                .getFieldErrors()
-                .stream()
-                .map(FieldError::getDefaultMessage)
-                .collect(Collectors.joining(", "));
-
-        ExceptionResponse response = new ExceptionResponse(
-                LocalDateTime.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                "Validation Error",
-                message,
-                request.getRequestURI()
-        );
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        return buildError(HttpStatus.NOT_FOUND, "User Profile Not Found", ex.getMessage(), req);
     }
 
+    // ---------- 404: Auth User Not Found ----------
+    @ExceptionHandler(UserNotFound.class)
+    public ResponseEntity<ExceptionResponse> handleUserNotFound(
+            UserNotFound ex,
+            HttpServletRequest req
+    ) {
+        return buildError(HttpStatus.NOT_FOUND, "User Not Found", ex.getMessage(), req);
+    }
+
+    // ---------- 403: Forbidden ----------
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<ExceptionResponse> handleForbidden(
+            ForbiddenException ex,
+            HttpServletRequest req
+    ) {
+        return buildError(HttpStatus.FORBIDDEN, "Forbidden", ex.getMessage(), req);
+    }
+
+    // ---------- 409: Data Integrity ----------
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ExceptionResponse> handleCustomDataIntegrityViolation(
             DataIntegrityViolationException ex,
             HttpServletRequest req
     ) {
-        ExceptionResponse response = new ExceptionResponse(
+        return buildError(HttpStatus.CONFLICT, "Conflict", ex.getMessage(), req);
+    }
+
+    // ---------- 400: @Valid errors ----------
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ExceptionResponse> handleValidationErrors(
+            MethodArgumentNotValidException ex,
+            HttpServletRequest req
+    ) {
+        String msg = ex.getBindingResult().getFieldErrors()
+                .stream()
+                .map(this::formatFieldError)
+                .collect(Collectors.joining(", "));
+
+        return buildError(HttpStatus.BAD_REQUEST, "Validation Error", msg, req);
+    }
+
+    private String formatFieldError(FieldError fe) {
+        return fe.getField() + ": " + fe.getDefaultMessage();
+    }
+
+    // ---------- 400: Constraint Violations ----------
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ExceptionResponse> handleConstraintViolation(
+            ConstraintViolationException ex,
+            HttpServletRequest req
+    ) {
+        String msg = ex.getConstraintViolations().stream()
+                .map(cv -> cv.getPropertyPath() + ": " + cv.getMessage())
+                .collect(Collectors.joining(", "));
+
+        return buildError(HttpStatus.BAD_REQUEST, "Validation Error", msg, req);
+    }
+
+    // ---------- 400: JSON Parsing / Enum / Date / Type errors ----------
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ExceptionResponse> handleHttpMessageNotReadable(
+            HttpMessageNotReadableException ex,
+            HttpServletRequest req
+    ) {
+        String message;
+        Throwable cause = ex.getMostSpecificCause();
+
+        if (cause instanceof InvalidFormatException ife) {
+            String fieldPath = ife.getPath().stream()
+                    .map(ref -> ref.getFieldName() != null ? ref.getFieldName() : "[" + ref.getIndex() + "]")
+                    .collect(Collectors.joining("."));
+
+            String invalidValue = String.valueOf(ife.getValue());
+            Class<?> targetType = ife.getTargetType();
+
+            if (targetType.isEnum()) {
+                String allowed = Arrays.stream(targetType.getEnumConstants())
+                        .map(Object::toString)
+                        .collect(Collectors.joining(", "));
+                message = String.format("Invalid value '%s' for '%s'. Allowed: %s", invalidValue, fieldPath, allowed);
+
+            } else if (targetType.equals(LocalDate.class)) {
+                message = String.format("Invalid date for '%s'. Use YYYY-MM-DD", fieldPath);
+
+            } else if (Number.class.isAssignableFrom(targetType) || targetType.isPrimitive()) {
+                message = String.format("Invalid number '%s' for '%s'. Expected %s",
+                        invalidValue, fieldPath, targetType.getSimpleName());
+
+            } else {
+                message = String.format("Invalid value '%s' for '%s'. Expected %s",
+                        invalidValue, fieldPath, targetType.getSimpleName());
+            }
+
+        } else if (cause instanceof JsonParseException jpe) {
+            message = "Malformed JSON: " + jpe.getOriginalMessage();
+
+        } else if (cause instanceof JsonMappingException jme) {
+            String fieldPath = jme.getPath().stream()
+                    .map(ref -> ref.getFieldName() != null ? ref.getFieldName() : "[" + ref.getIndex() + "]")
+                    .collect(Collectors.joining("."));
+            message = String.format("JSON Mapping error in '%s': %s", fieldPath, jme.getOriginalMessage());
+
+        } else {
+            message = "Malformed JSON request.";
+        }
+
+        return buildError(HttpStatus.BAD_REQUEST, "Invalid Request Body", message, req);
+    }
+
+    // ---------- 400: Wrong type for query/path params ----------
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ExceptionResponse> handleTypeMismatch(
+            MethodArgumentTypeMismatchException ex,
+            HttpServletRequest req
+    ) {
+        String message = String.format(
+                "Parameter '%s' must be of type %s",
+                ex.getName(),
+                ex.getRequiredType() != null ? ex.getRequiredType().getSimpleName() : "unknown"
+        );
+
+        return buildError(HttpStatus.BAD_REQUEST, "Type Mismatch", message, req);
+    }
+
+    // ---------- 500: fallback ----------
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ExceptionResponse> handleAll(
+            Exception ex,
+            HttpServletRequest req
+    ) {
+        ex.printStackTrace();
+        return buildError(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error", ex.getMessage(), req);
+    }
+
+    // ---------- Helper ----------
+    private ResponseEntity<ExceptionResponse> buildError(
+            HttpStatus status,
+            String error,
+            String message,
+            HttpServletRequest req
+    ) {
+        ExceptionResponse body = new ExceptionResponse(
                 LocalDateTime.now(),
-                HttpStatus.CONFLICT.value(),       // 409
-                "Conflict",
-                ex.getMessage(),                   // "Email already exists or violates a data constraint"
+                status.value(),
+                error,
+                message,
                 req.getRequestURI()
         );
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+        return ResponseEntity.status(status).body(body);
     }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ExceptionResponse> handleBadCredentials(
+            BadCredentialsException ex,
+            HttpServletRequest req
+    ) {
+        return buildError(
+                HttpStatus.UNAUTHORIZED,
+                "Unauthorized",
+                "Invalid email or password",
+                req
+        );
+    }
+
 }
-
-
-

@@ -1,12 +1,14 @@
 package com.jobportal.user_service.controller;
 
-import com.jobportal.user_service.dto.UserPartialUpdateDto;
-import com.jobportal.user_service.dto.UserRequestDto;
-import com.jobportal.user_service.dto.UserResponseDto;
+import com.jobportal.user_service.dto.UserProfilePartialUpdateDto;
+import com.jobportal.user_service.dto.UserProfileRequestDto;
+import com.jobportal.user_service.dto.UserProfileResponseDto;
 import com.jobportal.user_service.service.UserProfileService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,47 +22,62 @@ public class UserProfileController {
 
     // CREATE: header ID is used as profile ID (FK to AuthUser.userId)
     @PostMapping("/create")
-    public UserResponseDto createUserProfile(@RequestHeader("X-User-Id") Long userId, @Valid @RequestBody UserRequestDto dto) {
-        return userProfileService.createUserProfile(dto, userId);
+    public ResponseEntity<UserProfileResponseDto> createUserProfile(
+            @RequestHeader("X-User-Id") Long userId,
+            @Valid @RequestBody UserProfileRequestDto dto
+    ) {
+        UserProfileResponseDto response = userProfileService.createUserProfile(dto, userId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     // READ: service checks pathId vs headerId
     @GetMapping("/{id}")
-    public UserResponseDto getById(@PathVariable Long id, @RequestHeader("X-User-Id") Long userId) {
-        return userProfileService.getUserProfileById(id, userId);
+    public ResponseEntity<UserProfileResponseDto> getById(
+            @PathVariable Long id,
+            @RequestHeader("X-User-Id") Long userId
+    ) {
+        UserProfileResponseDto response = userProfileService.getUserProfileById(id, userId);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/all")
-    public List<UserResponseDto> getAll() {
-        return userProfileService.getAllUserProfiles();
+    public ResponseEntity<List<UserProfileResponseDto>> getAll() {
+        List<UserProfileResponseDto> list = userProfileService.getAllUserProfiles();
+        return ResponseEntity.ok(list);
     }
 
-    // DELETE: service checks pathId vs headerId
+    //service checks pathId vs headerId
     @DeleteMapping("/{id}")
-    public void delete(
+    public ResponseEntity<Void> delete(
             @PathVariable Long id,
             @RequestHeader("X-User-Id") Long userId
     ) {
         userProfileService.deleteUserProfileById(id, userId);
+        return ResponseEntity.noContent().build();
     }
 
-    // FULL UPDATE: service checks pathId vs headerId
+    // service checks pathId vs headerId
     @PutMapping("/{id}")
-    public UserResponseDto update(
+    public ResponseEntity<UserProfileResponseDto> update(
             @PathVariable Long id,
             @RequestHeader("X-User-Id") Long userId,
-            @Valid @RequestBody UserRequestDto dto
+            @Valid @RequestBody UserProfileRequestDto dto
     ) {
-        return userProfileService.updateUserProfile(id, userId, dto);
+        UserProfileResponseDto response = userProfileService.updateUserProfile(id, userId, dto);
+        return ResponseEntity.ok(response);
     }
 
     // PARTIAL UPDATE: service checks pathId vs headerId
     @PatchMapping("/{id}")
-    public UserResponseDto patch(
+    public ResponseEntity<UserProfileResponseDto> patch(
             @PathVariable Long id,
             @RequestHeader("X-User-Id") Long userId,
-            @Valid @RequestBody UserPartialUpdateDto dto
+            @Valid @RequestBody UserProfilePartialUpdateDto dto
     ) {
-        return userProfileService.partialUpdateUserProfile(id, userId, dto);
+        UserProfileResponseDto response = userProfileService.partialUpdateUserProfile(id, userId, dto);
+        return ResponseEntity.ok(response);
     }
+
+    public void applicationHistory(){}
+
 }

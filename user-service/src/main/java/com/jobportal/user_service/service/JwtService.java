@@ -1,7 +1,7 @@
 package com.jobportal.user_service.service;
 
 
-import com.jobportal.user_service.entity.AuthUser;
+import com.jobportal.user_service.entity.UserCredential;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,7 +23,7 @@ public class JwtService {
     private long jwtExpiration;
 
     // TOKEN GENERATION
-    public String generateToken(AuthUser user) {
+    public String generateToken(UserCredential user) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("username", user.getEmail());
         claims.put("role", user.getRole().getRoleName());
