@@ -1,8 +1,8 @@
 package com.jobportal.user_service.controller;
 
-import com.jobportal.user_service.dto.UserPartialUpdateDto;
-import com.jobportal.user_service.dto.UserRequestDto;
-import com.jobportal.user_service.dto.UserResponseDto;
+import com.jobportal.user_service.dto.UserProfilePartialUpdateDto;
+import com.jobportal.user_service.dto.UserProfileRequestDto;
+import com.jobportal.user_service.dto.UserProfileResponseDto;
 import com.jobportal.user_service.service.UserProfileService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,31 +22,31 @@ public class UserProfileController {
 
     // CREATE: header ID is used as profile ID (FK to AuthUser.userId)
     @PostMapping("/create")
-    public ResponseEntity<UserResponseDto> createUserProfile(
+    public ResponseEntity<UserProfileResponseDto> createUserProfile(
             @RequestHeader("X-User-Id") Long userId,
-            @Valid @RequestBody UserRequestDto dto
+            @Valid @RequestBody UserProfileRequestDto dto
     ) {
-        UserResponseDto response = userProfileService.createUserProfile(dto, userId);
+        UserProfileResponseDto response = userProfileService.createUserProfile(dto, userId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     // READ: service checks pathId vs headerId
     @GetMapping("/{id}")
-    public ResponseEntity<UserResponseDto> getById(
+    public ResponseEntity<UserProfileResponseDto> getById(
             @PathVariable Long id,
             @RequestHeader("X-User-Id") Long userId
     ) {
-        UserResponseDto response = userProfileService.getUserProfileById(id, userId);
+        UserProfileResponseDto response = userProfileService.getUserProfileById(id, userId);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<UserResponseDto>> getAll() {
-        List<UserResponseDto> list = userProfileService.getAllUserProfiles();
+    public ResponseEntity<List<UserProfileResponseDto>> getAll() {
+        List<UserProfileResponseDto> list = userProfileService.getAllUserProfiles();
         return ResponseEntity.ok(list);
     }
 
-    // DELETE: service checks pathId vs headerId
+    //service checks pathId vs headerId
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(
             @PathVariable Long id,
@@ -56,25 +56,28 @@ public class UserProfileController {
         return ResponseEntity.noContent().build();
     }
 
-    // FULL UPDATE: service checks pathId vs headerId
+    // service checks pathId vs headerId
     @PutMapping("/{id}")
-    public ResponseEntity<UserResponseDto> update(
+    public ResponseEntity<UserProfileResponseDto> update(
             @PathVariable Long id,
             @RequestHeader("X-User-Id") Long userId,
-            @Valid @RequestBody UserRequestDto dto
+            @Valid @RequestBody UserProfileRequestDto dto
     ) {
-        UserResponseDto response = userProfileService.updateUserProfile(id, userId, dto);
+        UserProfileResponseDto response = userProfileService.updateUserProfile(id, userId, dto);
         return ResponseEntity.ok(response);
     }
 
     // PARTIAL UPDATE: service checks pathId vs headerId
     @PatchMapping("/{id}")
-    public ResponseEntity<UserResponseDto> patch(
+    public ResponseEntity<UserProfileResponseDto> patch(
             @PathVariable Long id,
             @RequestHeader("X-User-Id") Long userId,
-            @Valid @RequestBody UserPartialUpdateDto dto
+            @Valid @RequestBody UserProfilePartialUpdateDto dto
     ) {
-        UserResponseDto response = userProfileService.partialUpdateUserProfile(id, userId, dto);
+        UserProfileResponseDto response = userProfileService.partialUpdateUserProfile(id, userId, dto);
         return ResponseEntity.ok(response);
     }
+
+    public void applicationHistory(){}
+
 }

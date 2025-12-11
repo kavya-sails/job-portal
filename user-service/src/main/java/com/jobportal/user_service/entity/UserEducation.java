@@ -17,12 +17,12 @@ import java.math.BigDecimal;
 public class UserEducation {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_profile_id")
     private Long id;
 
-    // One-to-one with UserProfile
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_profile_id", nullable = false, unique = true)
+    @MapsId
+    @JoinColumn(name = "user_profile_id", nullable = false)
     private UserProfile userProfile;
 
     @Enumerated(EnumType.STRING)
@@ -36,7 +36,8 @@ public class UserEducation {
     @Column(name = "institute", nullable = false, length = 150)
     private String institute;
 
-    @Column(name = "location", nullable = false, length = 100)
+    // Now nullable = true
+    @Column(name = "location", nullable = true, length = 100)
     private String location;
 
     @Column(name = "pass_out_year", nullable = false)
@@ -44,5 +45,4 @@ public class UserEducation {
 
     @Column(name = "percentage", nullable = false, precision = 5, scale = 2)
     private BigDecimal percentage;
-
 }

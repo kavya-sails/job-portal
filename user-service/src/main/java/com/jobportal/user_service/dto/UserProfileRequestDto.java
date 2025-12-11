@@ -13,8 +13,9 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class UserPartialUpdateDto {
+public class UserProfileRequestDto {
 
+    @NotBlank(message = "First name is required")
     @Size(min = 2, max = 50, message = "First name must be between 2 and 50 characters")
     @Pattern(
             regexp = "^[A-Za-z][A-Za-z\\s'-]{1,49}$",
@@ -22,6 +23,7 @@ public class UserPartialUpdateDto {
     )
     private String firstName;
 
+    @NotBlank(message = "Last name is required")
     @Size(min = 2, max = 50, message = "Last name must be between 2 and 50 characters")
     @Pattern(
             regexp = "^[A-Za-z][A-Za-z\\s'-]{1,49}$",
@@ -29,18 +31,22 @@ public class UserPartialUpdateDto {
     )
     private String lastName;
 
+    @NotNull(message = "Date of birth is required")
     @Past(message = "Date of birth must be in the past")
     private LocalDate dob;
 
+    // OPTIONAL
     @Size(max = 255, message = "Address must not exceed 255 characters")
     private String address;
 
+    @NotBlank(message = "Phone number is required")
     @Pattern(
             regexp = "^(?!([0-9])\\1{9,14})[0-9]{10,15}$",
             message = "Phone number must be 10–15 digits and not all the same digit"
     )
     private String phone;
 
+    // OPTIONAL
     @Size(max = 500, message = "Skills must not exceed 500 characters")
     @Pattern(
             regexp = "^[^,]+(,[^,]+)*$",
@@ -48,30 +54,33 @@ public class UserPartialUpdateDto {
     )
     private String skills;
 
+    @NotNull(message = "Experience is required")
     @Min(value = 0, message = "Experience cannot be negative")
     @Max(value = 50, message = "Experience cannot exceed 50 years")
-    private Integer experience;
+    private Integer experience; // in years
 
+    @NotNull(message = "Job role is required")
     private JobRole jobRole;
 
+    @NotNull(message = "Experience level is required")
     private ExperienceLevel experienceLevel;
 
-    @Min(value = 0, message = "Profile completion percentage cannot be less than 0")
-    @Max(value = 100, message = "Profile completion percentage cannot exceed 100")
-    private Integer profileCompletionPercentage;
-
+    // REQUIRED & must be URL
+    @NotBlank(message = "Resume URL is required")
     @Pattern(
             regexp = "^(http|https)://.*$",
             message = "Resume URL must be a valid URL"
     )
     private String resumeUrl;
 
+    // OPTIONAL
     @Pattern(
             regexp = "^(http|https)://.*$",
             message = "Portfolio URL must be a valid URL"
     )
     private String portfolioUrl;
 
+    // OPTIONAL
     @Pattern(
             regexp = "^(http|https)://.*$",
             message = "LinkedIn URL must be a valid URL"
@@ -79,5 +88,6 @@ public class UserPartialUpdateDto {
     private String linkedinUrl;
 
     @Valid
-    private EducationDto education; // optional in PATCH; if sent, must be complete
+    @NotNull(message = "Education details are required")
+    private EducationDto education;
 }

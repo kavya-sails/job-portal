@@ -22,7 +22,7 @@ public class EducationDto {
     @Size(max = 150, message = "Institute name must not exceed 150 characters")
     private String institute;
 
-    @NotBlank(message = "Location is required")
+    // Location is OPTIONAL now
     @Size(max = 100, message = "Location must not exceed 100 characters")
     private String location;
 

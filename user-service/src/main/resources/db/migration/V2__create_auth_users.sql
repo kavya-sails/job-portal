@@ -1,6 +1,5 @@
 -- V2__create_auth_users.sql
 
-
 CREATE TABLE auth_users (
     user_id     BIGINT AUTO_INCREMENT PRIMARY KEY,
     email       VARCHAR(255) NOT NULL UNIQUE,

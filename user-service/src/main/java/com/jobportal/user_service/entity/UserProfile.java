@@ -57,7 +57,8 @@ public class UserProfile {
 
     // -------------------- RESUME & LINKS --------------------
 
-    @Column(name = "resume_url", length = 255)
+    // NOT NULL in DB as per requirement
+    @Column(name = "resume_url", nullable = false, length = 255)
     private String resumeUrl;
 
     @Column(name = "resume_uploaded_at")
