@@ -2,7 +2,6 @@ package com.job_portal.job_service.controller.query;
 
 import com.job_portal.job_service.dto.query.JobDetailsQueryDto;
 import com.job_portal.job_service.dto.query.JobSearchCriteria;
-import com.job_portal.job_service.entity.JobEntity;
 import com.job_portal.job_service.service.query.JobQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

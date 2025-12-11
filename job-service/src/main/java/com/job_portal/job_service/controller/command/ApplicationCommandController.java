@@ -4,14 +4,9 @@ import com.job_portal.job_service.dto.command.ApplicationStatusResponseDto;
 import com.job_portal.job_service.dto.command.ApplicationStatusUpdateDto;
 import com.job_portal.job_service.entity.ApplicationEntity;
 import com.job_portal.job_service.service.command.ApplicationCommandService;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/jobs/applications")
