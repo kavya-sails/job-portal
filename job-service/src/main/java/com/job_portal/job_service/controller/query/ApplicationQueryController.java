@@ -1,14 +1,13 @@
 package com.job_portal.job_service.controller.query;
+
 import com.job_portal.job_service.dto.query.ApplicationHistoryQueryDto;
 import com.job_portal.job_service.exception.BadRequestException;
 import com.job_portal.job_service.exception.ForbiddenException;
 import com.job_portal.job_service.service.query.ApplicationQueryService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController

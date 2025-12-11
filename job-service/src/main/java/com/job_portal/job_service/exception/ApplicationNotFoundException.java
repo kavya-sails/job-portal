@@ -9,4 +9,3 @@ public class ApplicationNotFoundException extends BaseAppException {
                 "No application exists with id = " + applicationId);
     }
 }
-

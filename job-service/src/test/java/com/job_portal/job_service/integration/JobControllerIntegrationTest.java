@@ -195,4 +195,3 @@ public class JobControllerIntegrationTest {
                 .andExpect(status().isNotFound());
     }
 }
-
