@@ -23,7 +23,7 @@ public class JobCommandController {
 
     // update a job (including extend expiry_date)
     @PutMapping("/{jobId}")
-    public ResponseEntity<JobDetailsQueryDto> updateJob(@PathVariable Long jobId, @Valid @RequestBody JobCommandDto dto) {
+    public ResponseEntity<JobDetailsQueryDto> updateJob(@PathVariable Long jobId, @RequestBody JobCommandDto dto) {
         JobDetailsQueryDto updated = jobCommandService.updateJob(jobId, dto);
         return ResponseEntity.ok(updated);
     }
