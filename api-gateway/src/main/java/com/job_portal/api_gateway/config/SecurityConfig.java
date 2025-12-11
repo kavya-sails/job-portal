@@ -1,5 +1,6 @@
 package com.job_portal.api_gateway.config;
 
+import com.job_portal.api_gateway.enums.Role;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -33,13 +34,13 @@ public class SecurityConfig {
                 .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers("/api/users/login", "/api/users/register", "/actuator/**").permitAll()
-                        .pathMatchers("/api/users").hasRole("ADMIN")
-                        .pathMatchers(HttpMethod.POST,"/api/jobs/applications/{jobId}").hasAnyRole("USER")
-                        .pathMatchers(HttpMethod.PUT,"/api/jobs/applications/{applicationId}/status").hasAnyRole("RECRUITER")
+                        .pathMatchers("/api/users").hasRole(Role.ADMIN.name())
+                        .pathMatchers(HttpMethod.POST,"/api/jobs/applications/{jobId}").hasAnyRole(Role.USER.name())
+                        .pathMatchers(HttpMethod.PUT,"/api/jobs/applications/{applicationId}/status").hasAnyRole(Role.RECRUITER.name())
                         .pathMatchers(HttpMethod.GET,"/api/jobs/applications/**").permitAll()
-                        .pathMatchers(HttpMethod.POST,"/api/jobs").hasAnyRole("RECRUITER")
-                        .pathMatchers(HttpMethod.PUT ,"/api/jobs/{jobId}").hasAnyRole("RECRUITER")
-                        .pathMatchers(HttpMethod.DELETE,"/api/jobs/{jobId}").hasAnyRole("ADMIN")
+                        .pathMatchers(HttpMethod.POST,"/api/jobs").hasAnyRole(Role.RECRUITER.name())
+                        .pathMatchers(HttpMethod.PUT ,"/api/jobs/{jobId}").hasAnyRole(Role.RECRUITER.name())
+                        .pathMatchers(HttpMethod.DELETE,"/api/jobs/{jobId}").hasAnyRole(Role.ADMIN.name())
                         .pathMatchers(HttpMethod.GET,"/api/jobs/**").permitAll()
                         .anyExchange().authenticated()
                 )
