@@ -1,7 +1,7 @@
 package com.job_portal.job_service.controller.command;
 
 import com.job_portal.job_service.dto.command.JobCommandDto;
-import com.job_portal.job_service.entity.JobEntity;
+import com.job_portal.job_service.dto.query.JobDetailsQueryDto;
 import com.job_portal.job_service.service.command.JobCommandService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -16,15 +16,15 @@ public class JobCommandController {
 
     // create a job
     @PostMapping
-    public ResponseEntity<JobEntity> createJob(@Valid @RequestBody JobCommandDto dto) {
-        JobEntity created = jobCommandService.createJob(dto);
+    public ResponseEntity<JobDetailsQueryDto> createJob(@Valid @RequestBody JobCommandDto dto) {
+        JobDetailsQueryDto created = jobCommandService.createJob(dto);
         return ResponseEntity.ok(created);
     }
 
     // update a job (including extend expiry_date)
     @PutMapping("/{jobId}")
-    public ResponseEntity<JobEntity> updateJob(@PathVariable Long jobId, @Valid @RequestBody JobCommandDto dto) {
-        JobEntity updated = jobCommandService.updateJob(jobId, dto);
+    public ResponseEntity<JobDetailsQueryDto> updateJob(@PathVariable Long jobId, @Valid @RequestBody JobCommandDto dto) {
+        JobDetailsQueryDto updated = jobCommandService.updateJob(jobId, dto);
         return ResponseEntity.ok(updated);
     }
 

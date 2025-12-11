@@ -25,16 +25,4 @@ public class JobApplicationMapper {
                 .expiresAt(e.getExpiresAt())
                 .build();
     }
-
-    public static ApplicationHistoryQueryDto toApplicationHistory(ApplicationEntity a) {
-        if(a==null) return null;
-        return ApplicationHistoryQueryDto.builder()
-                .applicationId(a.getApplicationId())
-                .jobId(a.getJob().getJobId())
-                .jobTitle(a.getJob().getTitle())
-                .companyName(a.getCompanyName())   // ensure ApplicationHistoryQueryDto contains this
-                .appliedDate(a.getAppliedDate())
-                .status(a.getStatus())
-                .build();
-    }
 }
