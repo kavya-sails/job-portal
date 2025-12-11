@@ -37,6 +37,14 @@ public class JobSpecification {
                 );
             }
 
+            if (hasText(c.getCompanyName())) {
+                String company = normalize(c.getCompanyName());
+                predicates.add(
+                        cb.like(cb.lower(root.get("companyName")), "%" + company + "%")
+                );
+            }
+
+
             // ============================
             // Exclude Expired Jobs
             // ============================

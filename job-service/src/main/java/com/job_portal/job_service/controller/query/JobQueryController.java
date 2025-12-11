@@ -37,12 +37,16 @@ public class JobQueryController {
             @RequestParam(required = false) String location,
             @RequestParam(required = false) Integer experienceRequired,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String companyName
+
+
+            ) {
         JobSearchCriteria criteria = new JobSearchCriteria();
         criteria.setTitle(title);
         criteria.setLocation(location);
         criteria.setExperienceRequired(experienceRequired);
+        criteria.setCompanyName(companyName);
 
         Pageable pageable = PageRequest.of(page, size);
 

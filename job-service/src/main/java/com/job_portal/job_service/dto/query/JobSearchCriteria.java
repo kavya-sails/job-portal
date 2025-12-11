@@ -7,4 +7,5 @@ public class JobSearchCriteria {
     private String title;
     private String location;
     private Integer experienceRequired;
+    private String companyName;
 }

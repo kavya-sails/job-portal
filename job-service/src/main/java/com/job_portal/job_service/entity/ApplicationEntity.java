@@ -14,7 +14,8 @@ import jakarta.persistence.*;
 @AllArgsConstructor
 @Builder
 @JsonIgnoreProperties({"hibernateLazyInitializer","handler"})
-public class ApplicationEntity {
+public class ApplicationEntity
+{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "application_id")
