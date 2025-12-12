@@ -9,6 +9,6 @@ import org.springframework.web.bind.annotation.PathVariable;
         configuration = FeignClientConfig.class
 )
 public interface UserClient {
-    @GetMapping("/api/users/{userId}")
+    @GetMapping("/api/users/profile/apply/{userId}")
     void checkUserExists(@PathVariable("userId") Long userId);
 }
