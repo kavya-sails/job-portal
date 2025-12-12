@@ -56,18 +56,14 @@ public class JwtReactiveAuthenticationManager implements ReactiveAuthenticationM
         }
 
         //if introspect enabled, calls the authorization server to verify if the token is active
-        return introspectionClient.introspect(introspectionUrl, "Bearer " + token)
+        return introspectionClient.introspect(introspectionUrl, userId)
                 .flatMap(map -> {
                     boolean active = Boolean.TRUE.equals(map.get("active"));
-
                     if (!active) {
                         log.warn("Introspection: token inactive");
                         return Mono.error(new BadCredentialsException("Introspection: token inactive"));
                     }
-                    //if active extract remote claims
-                    @SuppressWarnings("unchecked")
-                    Map<String, Object> claims = (Map<String, Object>) map.get("claims");
-                    return Mono.just(buildSuccessAuth(userId, username, role, jti, claims));
+                    return Mono.just(buildSuccessAuth(userId, username, role, jti, jwt.getClaims()));
                 })
                 //if introspection unreachable fallback to local JWT validation
                 .onErrorResume(ex -> {

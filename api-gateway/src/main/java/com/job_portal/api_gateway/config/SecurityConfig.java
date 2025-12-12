@@ -22,6 +22,7 @@ import org.springframework.security.web.server.context.NoOpServerSecurityContext
 public class SecurityConfig {
     private final ReactiveAuthenticationManager jwtReactiveAuthenticationManager;
     private final ServerAuthenticationConverter bearerTokenConverter;
+
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         AuthenticationWebFilter authenticationWebFilter =

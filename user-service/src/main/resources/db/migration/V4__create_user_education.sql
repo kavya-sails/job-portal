@@ -1,5 +1,3 @@
--- V5__create_user_education.sql
-
 CREATE TABLE user_education (
     user_profile_id    BIGINT NOT NULL,
     highest_education  VARCHAR(50) NOT NULL,

@@ -1,5 +1,3 @@
--- V6__insert_mock_roles_and_users.sql
-
 INSERT INTO roles (role_name)
 VALUES
     ('ADMIN'),

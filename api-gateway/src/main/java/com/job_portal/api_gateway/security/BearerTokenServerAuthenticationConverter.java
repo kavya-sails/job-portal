@@ -35,4 +35,3 @@ public class BearerTokenServerAuthenticationConverter implements ServerAuthentic
         return Mono.just(new UsernamePasswordAuthenticationToken(token, token));
     }
 }
-

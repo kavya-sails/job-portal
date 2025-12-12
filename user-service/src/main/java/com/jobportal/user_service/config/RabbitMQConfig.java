@@ -13,7 +13,6 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class RabbitMQConfig {
-
     public static final String JOB_STATUS_QUEUE = "job_application_status";
     public static final String JOB_EXCHANGE = "job-events-exchange";
     public static final String JOB_ROUTING_KEY = "job.status.updated";
@@ -54,5 +53,4 @@ public class RabbitMQConfig {
         factory.setMessageConverter(messageConverter);
         return factory;
     }
-
 }

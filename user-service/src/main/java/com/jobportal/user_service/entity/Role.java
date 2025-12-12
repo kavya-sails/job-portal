@@ -1,5 +1,6 @@
 package com.jobportal.user_service.entity;
 
+import com.jobportal.user_service.enums.RoleName;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,5 +18,6 @@ public class Role {
     private Long roleId;
 
     @Column(nullable = false, unique = true)
-    private String roleName;   // ADMIN, RECRUITER, USER
+    @Enumerated(EnumType.STRING)
+    private RoleName roleName;
 }
