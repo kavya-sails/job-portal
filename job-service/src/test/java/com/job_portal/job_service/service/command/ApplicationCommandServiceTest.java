@@ -1,120 +1,191 @@
 package com.job_portal.job_service.service.command;
 
+import com.job_portal.job_service.client.UserClient;
+import com.job_portal.job_service.dto.command.ApplicationStatusResponseDto;
+import com.job_portal.job_service.dto.event.ApplicationStatusEvent;
+import com.job_portal.job_service.dto.query.ApplicationHistoryQueryDto;
 import com.job_portal.job_service.entity.ApplicationEntity;
 import com.job_portal.job_service.entity.ApplicationStatus;
 import com.job_portal.job_service.entity.JobEntity;
+import com.job_portal.job_service.exception.ApplicationConflictException;
+import com.job_portal.job_service.exception.ApplicationNotFoundException;
+import com.job_portal.job_service.exception.JobNotFoundException;
+import com.job_portal.job_service.exception.MessagePublishException;
 import com.job_portal.job_service.publisher.ApplicationStatusPublisher;
 import com.job_portal.job_service.repository.command.ApplicationCommandRepository;
 import com.job_portal.job_service.repository.query.JobQueryRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
+import java.time.Instant;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.catchThrowable;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+// Make Mockito lenient for this test class so unused global stubbings won't fail tests.
+// Alternative (recommended for stricter tests): remove global stubbing and stub per-test.
+@MockitoSettings(strictness = Strictness.LENIENT)
 class ApplicationCommandServiceTest {
 
     @Mock
-    private ApplicationCommandRepository applicationRepo;
+    private ApplicationCommandRepository applicationCommandRepository;
 
     @Mock
-    private JobQueryRepository jobRepo;
+    private JobQueryRepository jobQueryRepository;
 
     @Mock
     private ApplicationStatusPublisher statusPublisher;
 
+    // Mock the UserClient dependency so userClient is injected and not null
+    @Mock
+    private UserClient userClient;
+
     @InjectMocks
-    private ApplicationCommandService service;
+    private ApplicationCommandService applicationCommandService;
 
-    @Test
-    void apply_jobNotFound_throws() {
-        // jobId = 5 does not exist
-        when(jobRepo.findById(5L)).thenReturn(Optional.empty());
-
-        Throwable t = catchThrowable(() -> service.apply(1L, 5L)); // userId = 1, jobId = 5
-        assertThat(t).isInstanceOf(RuntimeException.class); // replace with JobNotFoundException if available
+    @BeforeEach
+    void setUp() {
+        // global default: make user-client a no-op (void method)
+        doNothing().when(userClient).checkUserExists(anyLong());
     }
 
     @Test
-    void apply_alreadyApplied_throwsConflict() {
-        // Arrange: job exists and an application already exists for userId = 1 and jobId = 10
-        JobEntity j = JobEntity.builder().jobId(10L).companyName("C").build();
-        when(jobRepo.findById(10L)).thenReturn(Optional.of(j));
+    void apply_whenJobExistsAndNoPriorApplication_shouldSaveAndReturnHistory() {
+        Long jobId = 1L;
+        Long userId = 11L;
+        JobEntity job = JobEntity.builder().jobId(jobId).companyName("Org").title("T").build();
+        when(jobQueryRepository.findById(jobId)).thenReturn(Optional.of(job));
+        when(applicationCommandRepository.findByJobJobIdAndUserId(jobId, userId)).thenReturn(Optional.empty());
 
-        // applicationRepo should return an existing application for jobId=10 and userId=1
-        when(applicationRepo.findByJobJobIdAndUserId(10L, 1L))
-                .thenReturn(Optional.of(
-                        ApplicationEntity.builder()
-                                .applicationId(2L)
-                                .job(j)
-                                .userId(1L)   // existing application belongs to userId = 1
-                                .build()
-                ));
-
-        // Act: call service with userId = 1, jobId = 10 (match the stub)
-        Throwable t = catchThrowable(() -> service.apply(1L, 10L));
-        assertThat(t).isInstanceOf(RuntimeException.class); // replace with ApplicationConflictException if available
-    }
-
-    @Test
-    void apply_success_savesAndReturns() {
-        // Arrange: job exists and no existing application for userId = 1
-        JobEntity j = JobEntity.builder().jobId(10L).companyName("C").build();
-        when(jobRepo.findById(10L)).thenReturn(Optional.of(j));
-        when(applicationRepo.findByJobJobIdAndUserId(10L, 1L)).thenReturn(Optional.empty());
-
-        ArgumentCaptor<ApplicationEntity> captor = ArgumentCaptor.forClass(ApplicationEntity.class);
         ApplicationEntity saved = ApplicationEntity.builder()
-                .applicationId(100L)
-                .job(j)
-                .userId(1L)
+                .applicationId(200L)
+                .job(job)
+                .userId(userId)
+                .companyName("Org")
+                .appliedDate(Instant.now())
                 .status(ApplicationStatus.PENDING)
                 .build();
-        when(applicationRepo.save(captor.capture())).thenReturn(saved);
 
-        // Act
-        var result = service.apply(1L, 10L);
+        when(applicationCommandRepository.save(any(ApplicationEntity.class))).thenReturn(saved);
 
-        // Assert
+        ApplicationHistoryQueryDto result = applicationCommandService.apply(userId, jobId);
+
         assertThat(result).isNotNull();
-        assertThat(result.getApplicationId()).isEqualTo(100L);
-        assertThat(captor.getValue().getUserId()).isEqualTo(1L);
-        verify(applicationRepo).save(any(ApplicationEntity.class));
+        assertThat(result.getApplicationId()).isEqualTo(200L);
+        assertThat(result.getJobId()).isEqualTo(jobId);
+        verify(applicationCommandRepository).findByJobJobIdAndUserId(jobId, userId);
+        verify(applicationCommandRepository).save(any(ApplicationEntity.class));
+        verify(userClient).checkUserExists(userId);
     }
 
     @Test
-    void updateStatus_notFound_throws() {
-        when(applicationRepo.findById(999L)).thenReturn(Optional.empty());
-        Throwable t = catchThrowable(() -> service.updateStatus(999L, ApplicationStatus.SELECTED));
-        assertThat(t).isInstanceOf(RuntimeException.class); // or ApplicationNotFoundException
+    void apply_whenJobNotFound_shouldThrowJobNotFound() {
+        when(jobQueryRepository.findById(999L)).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> applicationCommandService.apply(1L, 999L))
+                .isInstanceOf(JobNotFoundException.class);
     }
 
     @Test
-    void updateStatus_success_updatesAndReturns() {
-        // Prepare a job and an application that references it
-        JobEntity j = JobEntity.builder().jobId(10L).title("SWE").companyName("Acme").build();
+    void apply_whenAlreadyApplied_shouldThrowConflict() {
+        Long jobId = 2L, userId = 3L;
+        JobEntity job = JobEntity.builder().jobId(jobId).build();
+        ApplicationEntity existing = ApplicationEntity.builder().applicationId(10L).userId(userId).job(job).build();
 
+        when(jobQueryRepository.findById(jobId)).thenReturn(Optional.of(job));
+        when(applicationCommandRepository.findByJobJobIdAndUserId(jobId, userId)).thenReturn(Optional.of(existing));
+
+        assertThatThrownBy(() -> applicationCommandService.apply(userId, jobId))
+                .isInstanceOf(ApplicationConflictException.class);
+
+        verify(applicationCommandRepository).findByJobJobIdAndUserId(jobId, userId);
+        verify(applicationCommandRepository, never()).save(any(ApplicationEntity.class));
+        verify(userClient).checkUserExists(userId);
+    }
+
+    @Test
+    void updateStatus_whenApplicationExists_shouldPublishAndReturnStatus() {
+        Long appId = 50L;
+        JobEntity job = JobEntity.builder().jobId(9L).title("Title").build();
         ApplicationEntity existing = ApplicationEntity.builder()
-                .applicationId(5L)
-                .job(j)
-                .userId(1L)
+                .applicationId(appId)
+                .job(job)
+                .userId(7L)
                 .status(ApplicationStatus.PENDING)
                 .build();
 
-        when(applicationRepo.findById(5L)).thenReturn(Optional.of(existing));
-        when(applicationRepo.save(any())).thenAnswer(i -> i.getArgument(0));
+        when(applicationCommandRepository.findById(appId)).thenReturn(Optional.of(existing));
+        when(applicationCommandRepository.save(any(ApplicationEntity.class))).thenAnswer(inv -> {
+            ApplicationEntity a = inv.getArgument(0);
+            a.setApplicationId(appId);
+            return a;
+        });
 
-        var resp = service.updateStatus(5L, ApplicationStatus.SELECTED);
+        // publisher does not throw
+        doNothing().when(statusPublisher).publish(any(ApplicationStatusEvent.class));
+
+        ApplicationStatusResponseDto resp = applicationCommandService.updateStatus(appId, ApplicationStatus.SELECTED);
 
         assertThat(resp).isNotNull();
+        assertThat(resp.getApplicationId()).isEqualTo(appId);
         assertThat(resp.getStatus()).isEqualTo(ApplicationStatus.SELECTED);
-        verify(applicationRepo).save(existing);
-        verify(statusPublisher).publish(any());
+        verify(statusPublisher).publish(any(ApplicationStatusEvent.class));
+    }
+
+    @Test
+    void updateStatus_whenPublisherThrows_shouldWrapInMessagePublishException() {
+        Long appId = 60L;
+        JobEntity job = JobEntity.builder().jobId(2L).title("t").build();
+        ApplicationEntity existing = ApplicationEntity.builder()
+                .applicationId(appId)
+                .job(job)
+                .userId(8L)
+                .status(ApplicationStatus.PENDING)
+                .build();
+
+        when(applicationCommandRepository.findById(appId)).thenReturn(Optional.of(existing));
+        when(applicationCommandRepository.save(any(ApplicationEntity.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        doThrow(new RuntimeException("broker down")).when(statusPublisher).publish(any(ApplicationStatusEvent.class));
+
+        assertThatThrownBy(() -> applicationCommandService.updateStatus(appId, ApplicationStatus.REJECTED))
+                .isInstanceOf(MessagePublishException.class)
+                .hasMessageContaining("broker down");
+
+        verify(statusPublisher).publish(any(ApplicationStatusEvent.class));
+    }
+
+    @Test
+    void updateStatus_whenApplicationNotFound_shouldThrow() {
+        when(applicationCommandRepository.findById(999L)).thenReturn(Optional.empty());
+        assertThatThrownBy(() -> applicationCommandService.updateStatus(999L, ApplicationStatus.SELECTED))
+                .isInstanceOf(ApplicationNotFoundException.class);
+    }
+
+    // Example test to simulate user-service unavailable (override default doNothing):
+    @Test
+    void apply_whenUserServiceUnavailable_shouldWrapOrPropagate() {
+        Long jobId = 1L;
+        Long userId = 21L;
+        JobEntity job = JobEntity.builder().jobId(jobId).companyName("Org").title("T").build();
+        when(jobQueryRepository.findById(jobId)).thenReturn(Optional.of(job));
+        when(applicationCommandRepository.findByJobJobIdAndUserId(jobId, userId)).thenReturn(Optional.empty());
+
+        // simulate user-service failure (UserClient.checkUserExists throws)
+        doThrow(new RuntimeException("user-service unavailable")).when(userClient).checkUserExists(userId);
+
+        // adjust expected behavior depending on how your service handles the runtime exception.
+        assertThatThrownBy(() -> applicationCommandService.apply(userId, jobId))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("user-service unavailable");
+
+        verify(userClient).checkUserExists(userId);
+        verify(applicationCommandRepository, never()).save(any(ApplicationEntity.class));
     }
 }
