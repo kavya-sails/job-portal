@@ -6,9 +6,9 @@ spring:
     name: user-service
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/job_portal_user
+    url: jdbc:postgresql://localhost:5432/user_details
     username: postgres
-    password: postgres
+    password: root
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -30,7 +30,7 @@ spring:
   mail:
     host: smtp.gmail.com
     port: 587
-    username: likhitha@gmail.com
+    username: idhanushd17@gmail.com
     password: qcjm acxg perq urdp
     properties:
       mail:
