@@ -13,7 +13,6 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@JsonIgnoreProperties({"hibernateLazyInitializer","handler"})
 public class ApplicationEntity
 {
     @Id

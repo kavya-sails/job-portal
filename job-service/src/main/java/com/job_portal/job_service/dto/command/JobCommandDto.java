@@ -46,52 +46,44 @@ import java.time.Instant;
 @Builder
 public class JobCommandDto {
 
-    @NotBlank(message = "title is required")
-    @Size(min = 3, max = 100, message = "Title must be between 3 and 100 characters")
+    @NotBlank(message = "Job title is required and cannot be empty")
+    @Size(min = 3, max = 100, message = "Job title must be between 3 and 100 characters")
     private String title;
 
-    @NotBlank(message = "Description cannot be empty")
-    @Size(min = 20, message = "Description must be at least 20 characters long")
+    @NotBlank(message = "Job description is required and cannot be empty")
+    @Size(min = 20, max = 5000, message = "Description must be between 20 and 5000 characters")
     private String description;
 
-    @NotBlank(message = "Location is required")
+    @NotBlank(message = "Location is required and cannot be empty")
+    @Size(min = 2, max = 255, message = "Location must be between 2 and 255 characters")
     private String location;
 
-    @NotNull(message = "Experience required cannot be null")
+    @NotNull(message = "Experience required is mandatory")
     @Min(value = 0, message = "Experience cannot be negative")
-    @Max(value = 50, message = "Experience cannot exceed 50 years")
+    @Max(value = 30, message = "Experience cannot exceed 50 years")
     private Integer experienceRequired;
 
-    /**
-     * Company name: required for job postings in most systems — adjust as needed.
-     */
-    @NotBlank(message = "companyName is required")
-    @Size(max = 255, message = "companyName must be at most 255 characters")
+    @NotBlank(message = "Company name is required")
+    @Size(min = 2, max = 255, message = "Company name must be between 2 and 255 characters")
     private String companyName;
 
-    /**
-     * packageOffered: optional, but cap the length
-     */
-    @Size(max = 255, message = "packageOffered must be at most 255 characters")
+    @NotBlank(message = "packageOffered is required and cannot be empty")
+    @Size(max = 255, message = "Package offered must be at most 255 characters")
     private String packageOffered;
 
-    /**
-     * Skills: free text list. Enforce a reasonable length.
-     * If you want structured skills validation (like CSV or JSON array), apply custom validator.
-     */
-    @Size(max = 2000, message = "skills cannot exceed 2000 characters")
+    @NotBlank(message = "Skills field is required (recruiter must provide relevant skills)")
+    @Size(min = 5, max = 2000, message = "Skills must be between 5 and 2000 characters")
     private String skills;
 
-    /**
-     * Education: free text (e.g. "B.Tech, M.Tech, MBA" or details)
-     */
-    @Size(max = 2000, message = "education cannot exceed 2000 characters")
+    @NotBlank(message = "Education details are required")
+    @Size(min = 3, max = 2000, message = "Education must be between 3 and 2000 characters")
     private String education;
 
-    @PastOrPresent(message = "postedDate cannot be in the future")
+    @PastOrPresent(message = "Posted date cannot be in the future")
     private Instant postedDate;
 
+    @NotNull(message = "Expiry days field is required")
     @Min(value = 1, message = "Expiry days must be at least 1")
-    @Max(value = 3650, message = "expiryDays seems too large")
+    @Max(value = 90, message = "Expiry days cannot exceed 10 years (3650 days)")
     private Integer expiryDays;
 }

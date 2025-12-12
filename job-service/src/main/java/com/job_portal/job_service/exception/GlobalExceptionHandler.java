@@ -63,12 +63,10 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.BAD_REQUEST, "Malformed JSON", ex.getMostSpecificCause().getMessage(), req);
     }
 
-
     @ExceptionHandler(ForbiddenException.class)
     public ResponseEntity<ExceptionResponse> handleForbidden(ForbiddenException ex, HttpServletRequest req) {
         return build(HttpStatus.FORBIDDEN, "Forbidden", ex.getMessage(), req);
     }
-
 
     @ExceptionHandler(MessagePublishException.class)
     public ResponseEntity<ExceptionResponse> handleMessagePublish(MessagePublishException ex, HttpServletRequest req) {

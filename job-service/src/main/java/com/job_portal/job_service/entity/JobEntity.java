@@ -14,7 +14,6 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-//@JsonIgnoreProperties({"hibernateLazyInitializer","handler"})
 public class JobEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,10 +38,6 @@ public class JobEntity {
     @Column(name = "package_offered", nullable = false)
     private String packageOffered;
 
-    /**
-     * Stored as free text (comma separated / newline) for now.
-     * If you want structured skills, convert to @ElementCollection or a separate table.
-     */
     @Column(columnDefinition = "text", nullable = false)
     private String skills;
 
