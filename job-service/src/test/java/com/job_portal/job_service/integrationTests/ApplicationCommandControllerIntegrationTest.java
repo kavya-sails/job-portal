@@ -25,7 +25,6 @@ import java.time.Instant;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
@@ -119,7 +118,7 @@ public class ApplicationCommandControllerIntegrationTest {
         // get persisted application id
         Long appId = appRepo.findByJobJobIdAndUserId(job.getJobId(), 5L).get().getApplicationId();
 
-        // simulate rabbit publish success - match the String,String,Object overload
+        // simulate rabbit publish success match the String,String,Object overload
         doNothing().when(rabbitTemplate).convertAndSend(
                 eq(RabbitMQConfig.EXCHANGE),
                 eq(RabbitMQConfig.ROUTING_KEY),

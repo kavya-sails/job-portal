@@ -6,12 +6,9 @@ import com.job_portal.job_service.service.query.JobQueryService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
-
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
-
 import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
@@ -23,19 +20,6 @@ class JobQueryControllerTest {
 
     @InjectMocks
     private JobQueryController controller;
-
-    // NO @BeforeEach openMocks — MockitoExtension handles it
-
-//    @Test
-//    void listJobs_returnsMappedList() {
-//        JobDetailsQueryDto dto = JobDetailsQueryDto.builder().jobId(1L).title("T").build();
-//        when(jobQueryService.getAllJobs()).thenReturn(List.of(dto));
-//
-//        var resp = controller.listJobs();
-//        assertThat(resp.getStatusCode().is2xxSuccessful()).isTrue();
-//        assertThat(resp.getBody()).hasSize(1);
-//        assertThat(resp.getBody().get(0).getTitle()).isEqualTo("T");
-//    }
 
     @Test
     void getJob_returnsDto() {

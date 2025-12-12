@@ -10,14 +10,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.*;
-import org.springframework.data.jpa.domain.Specification; // added
-
+import org.springframework.data.jpa.domain.Specification;
 import java.util.List;
 import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import org.mockito.ArgumentMatchers; // added
+import org.mockito.ArgumentMatchers;
 
 @ExtendWith(MockitoExtension.class)
 class JobQueryServiceTest {
@@ -64,10 +62,9 @@ class JobQueryServiceTest {
     @Test
     void searchJobs_mapsPageIntoDtoPage() {
         JobEntity e1 = JobEntity.builder().jobId(21L).title("P").build();
-        Pageable pageable = PageRequest.of(0, 10); // moved up so we can use eq(pageable)
+        Pageable pageable = PageRequest.of(0, 10);
         Page<JobEntity> page = new PageImpl<>(List.of(e1), pageable, 1);
 
-        // when repository called with any Specification and pageable, return page
         when(jobRepo.findAll(ArgumentMatchers.<Specification<JobEntity>>any(), eq(pageable))).thenReturn(page);
 
         JobSearchCriteria criteria = new JobSearchCriteria();

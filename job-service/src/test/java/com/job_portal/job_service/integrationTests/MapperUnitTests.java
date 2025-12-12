@@ -1,4 +1,5 @@
 package com.job_portal.job_service.integrationTests;
+
 import com.job_portal.job_service.dto.query.ApplicationHistoryQueryDto;
 import com.job_portal.job_service.dto.query.JobDetailsQueryDto;
 import com.job_portal.job_service.entity.ApplicationEntity;
@@ -7,9 +8,7 @@ import com.job_portal.job_service.entity.JobEntity;
 import com.job_portal.job_service.mapper.ApplicationCommandMapper;
 import com.job_portal.job_service.mapper.JobApplicationMapper;
 import org.junit.jupiter.api.Test;
-
 import java.time.Instant;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class MapperUnitTests {

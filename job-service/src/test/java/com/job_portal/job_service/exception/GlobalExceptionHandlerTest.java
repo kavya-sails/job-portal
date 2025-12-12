@@ -1,4 +1,5 @@
 package com.job_portal.job_service.exception;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
@@ -12,9 +13,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-/**
- * Tests that GlobalExceptionHandler maps exceptions to proper HTTP responses.
- */
 class GlobalExceptionHandlerTest {
 
     private MockMvc mockMvc;
@@ -63,7 +61,7 @@ class GlobalExceptionHandlerTest {
 
     @Test
     void handleInvalidJson_shouldReturn400() throws Exception {
-        // simulate HttpMessageNotReadableException mapping - call endpoint that throws that exact exception
+        // simulate HttpMessageNotReadableException mapping call endpoint that throws that exact exception
         mockMvc.perform(post("/test/invalidJson")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{ this is not : valid json }"))
@@ -122,7 +120,6 @@ class GlobalExceptionHandlerTest {
 
         @PostMapping("/test/invalidJson")
         public void invalidJson() {
-            // throw the same exception type to exercise its handler
             throw new HttpMessageNotReadableException("bad json", new RuntimeException("cause"));
         }
 

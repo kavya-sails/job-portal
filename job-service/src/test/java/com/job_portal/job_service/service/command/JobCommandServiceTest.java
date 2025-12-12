@@ -9,10 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import java.time.Instant;
 import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -28,7 +26,7 @@ class JobCommandServiceTest {
 
     @Test
     void createJob_shouldSaveAndReturnDetails() {
-        // arrange: mock dto
+        // arrange mock dto
         JobCommandDto dto = mock(JobCommandDto.class);
         when(dto.getTitle()).thenReturn("Developer");
         when(dto.getDescription()).thenReturn("desc");
