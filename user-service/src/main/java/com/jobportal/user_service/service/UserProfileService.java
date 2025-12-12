@@ -30,7 +30,7 @@ public class UserProfileService {
     private final UserProfileRepository userProfileRepository;
     private final UserCredentialRepository userCredentialRepository;
     private final UserProfileMapper userProfileMapper;
-    private final UserEducationMapper userEducationMapper; // <---- ADD THIS
+    private final UserEducationMapper userEducationMapper;
 
 
     public UserProfileResponseDto createUserProfile(UserProfileRequestDto dto, Long headerUserId) {
@@ -148,7 +148,6 @@ public class UserProfileService {
             // Map scalar fields, but NOT education (we ignored it in mapper)
             userProfileMapper.updateEntityFromDto(dto, userProfile);
 
-            // ----- handle education manually -----
             if (dto.getEducation() != null) {
                 if (userProfile.getEducation() == null) {
                     // no education yet -> create new
@@ -299,5 +298,10 @@ public class UserProfileService {
             profile.setResumeUploadedAt(LocalDateTime.now());
         }
     }
-
+    public void checkUserExists(Long userId) {
+        boolean exists = userProfileRepository.existsById(userId);
+        if (!exists) {
+            throw new UserNotFound("User not found");
+        }
+    }
 }
