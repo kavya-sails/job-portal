@@ -3,7 +3,7 @@ package com.job_portal.job_service.controller.command;
 import com.job_portal.job_service.dto.command.JobCommandDto;
 import com.job_portal.job_service.dto.query.JobDetailsQueryDto;
 import com.job_portal.job_service.exception.GlobalExceptionHandler;
-..........................................................................import com.job_portal.job_service.service.command.JobCommandService;
+import com.job_portal.job_service.service.command.JobCommandService;
 import com.job_portal.job_service.testutils.ValidationTestUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
