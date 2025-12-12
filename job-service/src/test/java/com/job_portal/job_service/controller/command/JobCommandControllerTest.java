@@ -4,8 +4,6 @@ import com.job_portal.job_service.dto.command.JobCommandDto;
 import com.job_portal.job_service.dto.query.JobDetailsQueryDto;
 import com.job_portal.job_service.exception.GlobalExceptionHandler;
 import com.job_portal.job_service.service.command.JobCommandService;
-import com.job_portal.job_service.testutils.ValidationTestUtils;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -15,7 +13,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -48,13 +45,17 @@ class JobCommandControllerTest {
 
     @Test
     void createJob_valid_invokesService_andReturnsDto() {
+        // Build a DTO that satisfies bean validation constraints
         JobCommandDto dto = JobCommandDto.builder()
                 .title("Valid Title")
                 .description("This description has at least twenty characters.")
                 .location("Bengaluru")
                 .experienceRequired(3)
-                .companyName("C")
+                .companyName("Company Inc")         // >= 2 chars
                 .expiryDays(10)
+                .education("B.Tech in CS")         // required field
+                .skills("Java, Spring Boot")       // required field (non-empty)
+                .packageOffered("10 LPA")          // required field (non-empty)
                 .build();
 
         JobDetailsQueryDto returned = JobDetailsQueryDto.builder()

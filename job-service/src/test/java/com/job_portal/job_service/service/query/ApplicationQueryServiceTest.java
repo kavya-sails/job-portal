@@ -4,58 +4,54 @@ import com.job_portal.job_service.dto.query.ApplicationHistoryQueryDto;
 import com.job_portal.job_service.entity.ApplicationEntity;
 import com.job_portal.job_service.entity.JobEntity;
 import com.job_portal.job_service.repository.query.ApplicationQueryRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.List;
 import java.time.Instant;
+import java.util.Collections;
+import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class ApplicationQueryServiceTest {
 
     @Mock
-    private ApplicationQueryRepository repo;
+    private ApplicationQueryRepository applicationQueryRepository;
 
     @InjectMocks
-    private ApplicationQueryService service;
-
-    @BeforeEach
-    void setup() { MockitoAnnotations.openMocks(this); }
+    private ApplicationQueryService applicationQueryService;
 
     @Test
-    void getApplicationsByUser_returnsMappedList() {
-        // create and attach a JobEntity so ApplicationCommandMapper won't NPE
+    void getApplicationsByUser_returnsListMapped() {
         JobEntity job = JobEntity.builder()
-                .jobId(2L)
-                .title("Test Job")
-                .companyName("TestCo")
-                .location("Remote")
-                .description("desc")
-                .experienceRequired(1)
-                .postedDate(Instant.now())
-                .expiresAt(Instant.now().plusSeconds(3600))
-                .skills("Java")
-                .education("B.Tech")
-                .packageOffered("5LPA")
+                .jobId(10L)
+                .title("Developer")
                 .build();
 
-        ApplicationEntity e = ApplicationEntity.builder()
-                .applicationId(10L)
-                .userId(1L)
+        ApplicationEntity a = ApplicationEntity.builder()
+                .applicationId(2L)
                 .appliedDate(Instant.now())
-                .job(job)
-                .companyName(job.getCompanyName())
+                .job(job) // <-- Set job so mapper can read jobId
+                .userId(5L)
                 .build();
+        when(applicationQueryRepository.findByUserIdOrderByAppliedDateDesc(5L)).thenReturn(List.of(a));
 
-        when(repo.findByUserIdOrderByAppliedDateDesc(1L)).thenReturn(List.of(e));
+        List<ApplicationHistoryQueryDto> res = applicationQueryService.getApplicationsByUser(5L);
 
-        List<ApplicationHistoryQueryDto> list = service.getApplicationsByUser(1L);
-        assertThat(list).hasSize(1);
-        assertThat(list.getFirst()).isInstanceOf(ApplicationHistoryQueryDto.class);
-        assertThat(list.getFirst().getJobId()).isEqualTo(2L);
-        verify(repo).findByUserIdOrderByAppliedDateDesc(1L);
+        assertThat(res).hasSize(1);
+        assertThat(res.get(0).getApplicationId()).isEqualTo(2L);
+        verify(applicationQueryRepository).findByUserIdOrderByAppliedDateDesc(5L);
+    }
+
+    @Test
+    void getApplicationsByUser_emptyList_returnsEmpty() {
+        when(applicationQueryRepository.findByUserIdOrderByAppliedDateDesc(7L)).thenReturn(Collections.emptyList());
+        List<ApplicationHistoryQueryDto> res = applicationQueryService.getApplicationsByUser(7L);
+        assertThat(res).isEmpty();
+        verify(applicationQueryRepository).findByUserIdOrderByAppliedDateDesc(7L);
     }
 }
