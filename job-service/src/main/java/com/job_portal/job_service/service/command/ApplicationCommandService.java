@@ -1,15 +1,13 @@
 package com.job_portal.job_service.service.command;
 
+import com.job_portal.job_service.client.UserClient;
 import com.job_portal.job_service.dto.command.ApplicationStatusResponseDto;
 import com.job_portal.job_service.dto.event.ApplicationStatusEvent;
 import com.job_portal.job_service.dto.query.ApplicationHistoryQueryDto;
 import com.job_portal.job_service.entity.ApplicationEntity;
 import com.job_portal.job_service.entity.ApplicationStatus;
 import com.job_portal.job_service.entity.JobEntity;
-import com.job_portal.job_service.exception.ApplicationConflictException;
-import com.job_portal.job_service.exception.ApplicationNotFoundException;
-import com.job_portal.job_service.exception.JobNotFoundException;
-import com.job_portal.job_service.exception.MessagePublishException;
+import com.job_portal.job_service.exception.*;
 import com.job_portal.job_service.mapper.ApplicationCommandMapper;
 import com.job_portal.job_service.publisher.ApplicationStatusPublisher;
 import com.job_portal.job_service.repository.command.ApplicationCommandRepository;
@@ -26,9 +24,18 @@ public class ApplicationCommandService {
     private final ApplicationCommandRepository applicationCommandRepository;
     private final JobQueryRepository jobQueryRepository;
     private final ApplicationStatusPublisher statusPublisher;
+    private final UserClient userClient;
 
     @Transactional
     public ApplicationHistoryQueryDto apply(Long userId, Long jobId) {
+        try {
+            userClient.checkUserExists(userId); // returns normally -> user exists
+        } catch (UserNotFoundException ex) {
+            throw ex; // propagate so controller advice maps -> 404
+        } catch (Exception ex) {
+            // Map other errors (connection, 5xx) to a meaningful domain exception or 503
+            throw new RuntimeException("user-service unavailable", ex);
+        }
         JobEntity job = jobQueryRepository.findById(jobId)
                 .orElseThrow(() -> new JobNotFoundException(jobId));
 

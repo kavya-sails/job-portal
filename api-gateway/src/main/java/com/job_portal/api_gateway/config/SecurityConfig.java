@@ -38,7 +38,7 @@ public class SecurityConfig {
                         .pathMatchers("/api/users").hasRole(Role.ADMIN.name())
                         .pathMatchers(HttpMethod.POST,"/api/jobs/applications/{jobId}").hasAnyRole(Role.USER.name())
                         .pathMatchers(HttpMethod.PUT,"/api/jobs/applications/{applicationId}/status").hasAnyRole(Role.RECRUITER.name())
-                        .pathMatchers(HttpMethod.GET,"/api/jobs/applications/history/{userId}").hasRole("ADMIN")
+                        .pathMatchers(HttpMethod.GET,"/api/jobs/applications/history/{userId}").hasAnyRole("ADMIN","USER")
                         .pathMatchers(HttpMethod.POST,"/api/jobs").hasAnyRole(Role.RECRUITER.name())
                         .pathMatchers(HttpMethod.PUT ,"/api/jobs/{jobId}").hasAnyRole(Role.RECRUITER.name())
                         .pathMatchers(HttpMethod.DELETE,"/api/jobs/{jobId}").hasAnyRole(Role.ADMIN.name())

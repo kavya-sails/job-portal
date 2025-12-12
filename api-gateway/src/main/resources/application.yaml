@@ -15,10 +15,13 @@ eureka:
 
 auth:
   introspection:
-    enabled: true
-    url: http://localhost:8081/api/users/introspect
+    enabled: false
+    url: http://localhost:8081/api/auth/introspect
 
 security:
   jwt:
     secret-key: 036e0ce585032470454dc6ece4e78ac74918d56b70774ae7d1fd45ca0725ac4a
-    expiration-time: 36000000'
+    expiration-time: 36000000
+#logging:
+#  level:
+#    root: debug

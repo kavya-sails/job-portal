@@ -28,6 +28,10 @@ public class GlobalExceptionHandler {
         );
     }
 
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<ExceptionResponse> handleUserNotFoundException(UserNotFoundException ex, HttpServletRequest req) {
+        return  build(HttpStatus.NOT_FOUND, ex.getMessage(), ex.getMessage(), req);
+    }
     @ExceptionHandler(JobNotFoundException.class)
     public ResponseEntity<ExceptionResponse> handleJobNotFound(JobNotFoundException ex, HttpServletRequest req) {
         return build(HttpStatus.NOT_FOUND, "Job Not Found", ex.getMessage(), req);
