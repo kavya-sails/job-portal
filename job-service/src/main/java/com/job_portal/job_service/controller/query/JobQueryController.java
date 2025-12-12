@@ -17,11 +17,6 @@ import java.util.List;
 public class JobQueryController {
 
     private final JobQueryService jobQueryService;
-    @GetMapping
-    public ResponseEntity<List<JobDetailsQueryDto>> listJobs() {
-        List<JobDetailsQueryDto> result = jobQueryService.getAllJobs();
-        return ResponseEntity.ok(result);
-    }
 
     @GetMapping("/{jobId}")
     public ResponseEntity<JobDetailsQueryDto> getJob(@PathVariable Long jobId) {
@@ -30,7 +25,7 @@ public class JobQueryController {
     }
 
     // Search jobs with filters: title, location, experience
-    @GetMapping("/search")
+    @GetMapping
     public ResponseEntity<Page<JobDetailsQueryDto>> searchJobs(
             @RequestParam(required = false) String title,
             @RequestParam(required = false) String location,
