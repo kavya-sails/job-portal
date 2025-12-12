@@ -1,7 +1,6 @@
 package com.job_portal.job_service.client;
 
 import com.job_portal.job_service.exception.UserNotFoundException;
-import feign.RequestInterceptor;
 import feign.Response;
 import feign.codec.ErrorDecoder;
 import org.springframework.context.annotation.Bean;

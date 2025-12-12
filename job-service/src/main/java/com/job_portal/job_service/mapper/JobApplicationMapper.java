@@ -1,10 +1,6 @@
-
-
 package com.job_portal.job_service.mapper;
 
-import com.job_portal.job_service.entity.ApplicationEntity;
 import com.job_portal.job_service.entity.JobEntity;
-import com.job_portal.job_service.dto.query.ApplicationHistoryQueryDto;
 import com.job_portal.job_service.dto.query.JobDetailsQueryDto;
 
 public class JobApplicationMapper {
