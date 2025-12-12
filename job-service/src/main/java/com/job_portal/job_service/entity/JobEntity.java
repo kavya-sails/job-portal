@@ -1,0 +1,50 @@
+package com.job_portal.job_service.entity;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.time.Instant;
+
+@Entity
+@Table(name = "jobs")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class JobEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "job_id")
+    private Long jobId;
+
+    @Column(nullable = false, length = 100)
+    private String title;
+
+    @Column(columnDefinition = "text", nullable = false)
+    private String description;
+
+    @Column(nullable = false)
+    private String location;
+
+    @Column(name = "experience_required", nullable = false)
+    private Integer experienceRequired;
+
+    @Column(name = "company_name", nullable = false)
+    private String companyName;
+
+    @Column(name = "package_offered", nullable = false)
+    private String packageOffered;
+
+    @Column(columnDefinition = "text", nullable = false)
+    private String skills;
+
+    @Column(columnDefinition = "text", nullable = false)
+    private String education;
+
+    @Column(name = "posted_date", nullable = false)
+    private Instant postedDate;
+
+    @Column(name = "expires_at", nullable = false)
+    private Instant expiresAt;
+}
