@@ -1,4 +1,4 @@
-package com.job_portal.job_service.dto.query;
+package com.job_portal.job_service.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

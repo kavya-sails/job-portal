@@ -136,7 +136,6 @@ public class GlobalExceptionHandler {
         } else {
             message = "Malformed JSON request.";
         }
-
         return buildError(HttpStatus.BAD_REQUEST, "Invalid Request Body", message, req);
     }
 
