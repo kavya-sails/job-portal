@@ -4,6 +4,8 @@ import com.jobportal.user_service.dto.UserProfilePartialUpdateDto;
 import com.jobportal.user_service.dto.UserProfileRequestDto;
 import com.jobportal.user_service.dto.UserProfileResponseDto;
 import com.jobportal.user_service.service.UserProfileService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -14,10 +16,17 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/users/profile")
 @RequiredArgsConstructor
+@Tag(
+        name = "User Profile",
+        description = "Operations for creating, updating, and fetching user profiles."
+)
 public class UserProfileController {
     private final UserProfileService userProfileService;
 
-    // Create user profile
+    @Operation(
+            summary = "Create user profile",
+            description = "Creates a new user profile using the provided user details and X-User-Id."
+    )
     @PostMapping("/create")
     public ResponseEntity<UserProfileResponseDto> createUserProfile(
             @RequestHeader("X-User-Id") Long userId,
@@ -27,7 +36,10 @@ public class UserProfileController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    // checks if user is present in db
+    @Operation(
+            summary = "Check if user profile exists",
+            description = "Returns OK if the user profile exists in database."
+    )
     @GetMapping("/apply/{userId}")
     public ResponseEntity<?> checkUser(@PathVariable Long userId) {
         userProfileService.checkUserExists(userId);
@@ -35,6 +47,10 @@ public class UserProfileController {
     }
 
     // fetches user with specific id
+    @Operation(
+            summary = "Get user profile by ID",
+            description = "Returns user profile details for the given ID if accessible by logged-in user."
+    )
     @GetMapping("/{id}")
     public ResponseEntity<UserProfileResponseDto> getById(
             @PathVariable Long id,
@@ -45,6 +61,10 @@ public class UserProfileController {
     }
 
     // fetches all user profiles
+    @Operation(
+            summary = "Get all user profiles",
+            description = "Returns list of all user profiles present in the system."
+    )
     @GetMapping("/all")
     public ResponseEntity<List<UserProfileResponseDto>> getAll() {
         List<UserProfileResponseDto> list = userProfileService.getAllUserProfiles();
@@ -52,6 +72,10 @@ public class UserProfileController {
     }
 
     // Delete user profile
+    @Operation(
+            summary = "Delete user profile",
+            description = "Soft deletes user profile by marking active = false."
+    )
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(
             @PathVariable Long id,
@@ -62,6 +86,10 @@ public class UserProfileController {
     }
 
     // update user profile
+    @Operation(
+            summary = "Update user profile",
+            description = "Updates all user profile fields for the given ID."
+    )
     @PutMapping("/{id}")
     public ResponseEntity<UserProfileResponseDto> update(
             @PathVariable Long id,
@@ -73,6 +101,10 @@ public class UserProfileController {
     }
 
     // Partial Update
+    @Operation(
+            summary = "Partially update user profile",
+            description = "Updates only selected fields in the user profile."
+    )
     @PatchMapping("/{id}")
     public ResponseEntity<UserProfileResponseDto> patch(
             @PathVariable Long id,
