@@ -3,7 +3,6 @@ package com.jobportal.user_service.controller;
 import com.jobportal.user_service.dto.UserProfilePartialUpdateDto;
 import com.jobportal.user_service.dto.UserProfileRequestDto;
 import com.jobportal.user_service.dto.UserProfileResponseDto;
-import com.jobportal.user_service.entity.UserProfile;
 import com.jobportal.user_service.service.UserProfileService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +27,7 @@ public class UserProfileController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @GetMapping("apply/{userId}")
+    @GetMapping("/apply/{userId}")
     public ResponseEntity<?> checkUser(@PathVariable Long userId) {
         userProfileService.checkUserExists(userId);
         return ResponseEntity.ok().build();
