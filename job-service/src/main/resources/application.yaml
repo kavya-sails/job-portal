@@ -11,7 +11,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/jobdb
     username: postgres
-    password: admin    # quote the password
+    password: postgres   # quote the password
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -35,10 +35,13 @@ spring:
     username: guest
     password: guest
 
-eureka:                        # moved out from under flyway
+eureka:
   client:
-    register-with-eureka: false
-    fetch-registry: false
+    serverUrl:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    hostname: localhost
+    prefer-ip-address: true
 
 
 server:

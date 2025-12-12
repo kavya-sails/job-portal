@@ -29,11 +29,10 @@ public class ApplicationCommandService {
     @Transactional
     public ApplicationHistoryQueryDto apply(Long userId, Long jobId) {
         try {
-            userClient.checkUserExists(userId); // returns normally -> user exists
+            userClient.checkUserExists(userId);
         } catch (UserNotFoundException ex) {
-            throw ex; // propagate so controller advice maps -> 404
+            throw ex;
         } catch (Exception ex) {
-            // Map other errors (connection, 5xx) to a meaningful domain exception or 503
             throw new RuntimeException("user-service unavailable", ex);
         }
         JobEntity job = jobQueryRepository.findById(jobId)

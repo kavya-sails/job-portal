@@ -10,7 +10,6 @@ import com.job_portal.job_service.service.command.ApplicationCommandService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -22,9 +21,9 @@ public class ApplicationCommandController
     @PostMapping("/{jobId}")
     public ResponseEntity<ApplicationHistoryQueryDto> apply(
             @PathVariable Long jobId,
-            @RequestHeader("X-User-Id") Long userId)
+            @RequestHeader(value = "X-User-Id", required = false) Long userId)
     {
-        if (userId==null) {
+        if (userId == null) {
             throw new MissingUserIdHeaderException();
         }
         ApplicationHistoryQueryDto dto = commandService.apply(userId, jobId);
