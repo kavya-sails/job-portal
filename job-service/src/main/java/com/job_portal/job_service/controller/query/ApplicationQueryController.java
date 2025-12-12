@@ -17,8 +17,8 @@ public class ApplicationQueryController {
     private final ApplicationQueryService queryService;
 
     @GetMapping("/history/{userId}")
-    public ResponseEntity<List<ApplicationHistoryQueryDto>> getHistory(@PathVariable Long userId, @RequestHeader("X-User-Id") Long headerUserId, @RequestHeader("X-User-Role") String role) {
-        if (headerUserId==null) {
+    public ResponseEntity<List<ApplicationHistoryQueryDto>> getHistory(@PathVariable Long userId, @RequestHeader(value = "X-User-Id", required = false) Long headerUserId, @RequestHeader(value = "X-User-Role", required = false) String role) {
+        if (headerUserId == null) {
             throw new MissingUserIdHeaderException();
         }
 
