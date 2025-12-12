@@ -12,13 +12,10 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
         http
                 //  Disable CSRF because we use REST APIs
                 .csrf(AbstractHttpConfigurer::disable)
                 //.csrf(csrf -> csrf.disable()) // For pure stateless REST APIs
-
-
                 //  No session will be created or used
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -27,6 +24,13 @@ public class SecurityConfig {
                 // URL authorization rules
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/users/**").permitAll()
+
+                        .requestMatchers(
+                                "/swagger-ui.html",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/api-docs/**"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 );
         return http.build();

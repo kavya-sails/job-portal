@@ -1,9 +1,7 @@
 package com.jobportal.user_service.dto;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import com.jobportal.user_service.enums.RoleName;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 
 @Data
@@ -24,4 +22,7 @@ public class RegisterRequest {
             message = "Password must contain at least one uppercase, one lowercase, one digit, and one special character"
     )
     private String password;
+
+    @NotNull(message = "Role is required")
+    private RoleName roleName;
 }

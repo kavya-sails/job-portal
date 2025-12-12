@@ -1,14 +1,13 @@
--- V2__create_auth_users.sql
-
 CREATE TABLE credentials (
-    user_id     BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id     BIGSERIAL PRIMARY KEY,
     email       VARCHAR(255) NOT NULL UNIQUE,
     password    VARCHAR(255) NOT NULL,
     role_id     BIGINT NOT NULL,
-    is_active   TINYINT(1) NOT NULL DEFAULT 1,
-    created_at  DATETIME NULL,
-    updated_at  DATETIME NULL,
+    is_active   BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
     CONSTRAINT fk_credentials_role
         FOREIGN KEY (role_id)
         REFERENCES roles (id)
-) ENGINE=InnoDB;
+);

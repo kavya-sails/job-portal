@@ -1,5 +1,6 @@
 package com.job_portal.api_gateway.config;
 
+import com.job_portal.api_gateway.enums.Role;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -21,6 +22,7 @@ import org.springframework.security.web.server.context.NoOpServerSecurityContext
 public class SecurityConfig {
     private final ReactiveAuthenticationManager jwtReactiveAuthenticationManager;
     private final ServerAuthenticationConverter bearerTokenConverter;
+
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         AuthenticationWebFilter authenticationWebFilter =
@@ -33,7 +35,19 @@ public class SecurityConfig {
                 .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers("/api/users/login", "/api/users/register", "/actuator/**").permitAll()
-                        .pathMatchers("/api/users").hasRole("ADMIN")
+                        .pathMatchers("/api/users", "/api/users/profile/all").hasRole(Role.ADMIN.name())
+                        .pathMatchers(HttpMethod.DELETE,"/api/users/profile/{id}").hasRole(Role.ADMIN.name())
+                        .pathMatchers(HttpMethod.PUT,"/api/users/profile/{id}").hasRole(Role.USER.name())
+                        .pathMatchers(HttpMethod.PATCH,"/api/users/profile/{id}").hasRole(Role.USER.name())
+                        .pathMatchers(HttpMethod.GET,"/api/users/profile//{id}" ).hasRole(Role.USER.name())
+                        .pathMatchers(HttpMethod.POST,"/api/users/profile/create" ).hasRole(Role.USER.name())
+                        .pathMatchers(HttpMethod.POST,"/api/jobs/applications/{jobId}").hasRole(Role.USER.name())
+                        .pathMatchers(HttpMethod.PUT,"/api/jobs/applications/{applicationId}/status").hasRole(Role.RECRUITER.name())
+                        .pathMatchers(HttpMethod.GET,"/api/jobs/applications/history/{userId}").hasAnyRole(Role.ADMIN.name(),Role.USER.name())
+                        .pathMatchers(HttpMethod.POST,"/api/jobs").hasAnyRole(Role.RECRUITER.name())
+                        .pathMatchers(HttpMethod.PUT ,"/api/jobs/{jobId}").hasAnyRole(Role.RECRUITER.name())
+                        .pathMatchers(HttpMethod.DELETE,"/api/jobs/{jobId}").hasAnyRole(Role.ADMIN.name())
+                        .pathMatchers(HttpMethod.GET,"/api/jobs/**").permitAll()
                         .anyExchange().authenticated()
                 )
                 // Ensure our auth filter runs at AUTHENTICATION order (before AUTHORIZATION)

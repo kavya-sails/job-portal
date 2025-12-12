@@ -47,4 +47,3 @@ public class JwtTokenValidator {
         return jwt.getClaims().get("role").toString();
     }
 }
-

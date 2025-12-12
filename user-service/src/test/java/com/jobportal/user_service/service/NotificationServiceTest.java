@@ -3,65 +3,141 @@ package com.jobportal.user_service.service;
 import com.jobportal.user_service.dto.JobStatusNotificationRequest;
 import com.jobportal.user_service.entity.UserCredential;
 import com.jobportal.user_service.entity.UserProfile;
-import com.jobportal.user_service.repository.AuthUserRepository;
+import com.jobportal.user_service.enums.ApplicationStatus;
+import com.jobportal.user_service.exception.InvalidJobStatusException;
+import com.jobportal.user_service.exception.UserNotFound;
+import com.jobportal.user_service.repository.UserCredentialRepository;
 import com.jobportal.user_service.repository.UserProfileRepository;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
 class NotificationServiceTest {
 
-    @Mock
-    private UserProfileRepository userProfileRepository;
-
-    @Mock
-    private AuthUserRepository authUserRepository;
-
-    @Mock
-    private EmailService emailService;
-
-    @InjectMocks
-    private NotificationService notificationService;
-
     @Test
-    void testSendJobStatusNotification_Accepted() {
+    void selectedStatus_shouldSendSelectedEmail() {
+        UserProfileRepository profileRepo = mock(UserProfileRepository.class);
+        UserCredentialRepository credRepo = mock(UserCredentialRepository.class);
+        EmailService emailService = mock(EmailService.class);
 
-        //  Arrange
-        JobStatusNotificationRequest request = new JobStatusNotificationRequest();
-        request.setUserId(1L);
-        request.setJobId(1001L);
-        request.setStatus("ACCEPTED");
+        NotificationService service =
+                new NotificationService(profileRepo, credRepo, emailService);
 
         UserProfile profile = new UserProfile();
         profile.setId(1L);
-        profile.setFirstName("Test");
-        profile.setLastName("User");
+        profile.setFirstName("John");
+        profile.setLastName("Doe");
 
-        UserCredential userCredential = new UserCredential();
-        userCredential.setUserId(1L);
-        userCredential.setEmail("test@gmail.com");
+        UserCredential cred = new UserCredential();
+        cred.setUserId(1L);
+        cred.setEmail("john@mail.com");
 
-        when(userProfileRepository.findById(1L))
-                .thenReturn(Optional.of(profile));
+        when(profileRepo.findById(1L)).thenReturn(Optional.of(profile));
+        when(credRepo.findById(1L)).thenReturn(Optional.of(cred));
 
-        when(authUserRepository.findById(1L))
-                .thenReturn(Optional.of(userCredential));
+        JobStatusNotificationRequest req = new JobStatusNotificationRequest();
+        req.setUserId(1L);
+        req.setJobId(10L);
+        req.setStatus(ApplicationStatus.SELECTED);
 
-        //  Act
-        String response = notificationService.sendJobStatusNotification(request);
+        String result = service.sendJobStatusNotification(req);
 
-        //  Assert
-        assertTrue(response.contains("Notification email sent"));
+        assertEquals("Notification email sent to john@mail.com", result);
+        verify(emailService).sendEmail(
+                eq("john@mail.com"),
+                eq("Job Application Selected"),
+                contains("SELECTED")
+        );
+    }
 
-        verify(emailService, times(1))
-                .sendEmail(eq("test@gmail.com"), anyString(), anyString());
+    @Test
+    void rejectedStatus_shouldSendRejectedEmail() {
+        UserProfileRepository profileRepo = mock(UserProfileRepository.class);
+        UserCredentialRepository credRepo = mock(UserCredentialRepository.class);
+        EmailService emailService = mock(EmailService.class);
+
+        NotificationService service =
+                new NotificationService(profileRepo, credRepo, emailService);
+
+        UserProfile profile = new UserProfile();
+        profile.setId(2L);
+        profile.setFirstName("Jane");
+        profile.setLastName("Smith");
+
+        UserCredential cred = new UserCredential();
+        cred.setUserId(2L);
+        cred.setEmail("jane@mail.com");
+
+        when(profileRepo.findById(2L)).thenReturn(Optional.of(profile));
+        when(credRepo.findById(2L)).thenReturn(Optional.of(cred));
+
+        JobStatusNotificationRequest req = new JobStatusNotificationRequest();
+        req.setUserId(2L);
+        req.setJobId(22L);
+        req.setStatus(ApplicationStatus.REJECTED);
+
+        service.sendJobStatusNotification(req);
+
+        verify(emailService).sendEmail(
+                eq("jane@mail.com"),
+                eq("Job Application Update"),
+                contains("REJECTED")
+        );
+    }
+
+    @Test
+    void reviewedStatus_shouldThrowInvalidJobStatusException() {
+        UserProfileRepository profileRepo = mock(UserProfileRepository.class);
+        UserCredentialRepository credRepo = mock(UserCredentialRepository.class);
+        EmailService emailService = mock(EmailService.class);
+
+        NotificationService service = new NotificationService(profileRepo, credRepo, emailService);
+
+        Long userId = 1L;
+
+        UserProfile profile = new UserProfile();
+        profile.setId(userId);
+        profile.setFirstName("A");
+        profile.setLastName("B");
+
+        UserCredential cred = new UserCredential();
+        cred.setUserId(userId);
+        cred.setEmail("a@b.com");
+
+        when(profileRepo.findById(userId)).thenReturn(Optional.of(profile));
+        when(credRepo.findById(userId)).thenReturn(Optional.of(cred));
+
+        JobStatusNotificationRequest req = new JobStatusNotificationRequest();
+        req.setUserId(userId);
+        req.setJobId(10L);
+        req.setStatus(ApplicationStatus.REVIEWED);
+
+        assertThrows(InvalidJobStatusException.class, () -> service.sendJobStatusNotification(req));
+        verify(emailService, never()).sendEmail(anyString(), anyString(), anyString());
+    }
+
+
+    @Test
+    void profileNotFound_shouldThrowUserNotFound() {
+        UserProfileRepository profileRepo = mock(UserProfileRepository.class);
+
+        when(profileRepo.findById(1L)).thenReturn(Optional.empty());
+
+        NotificationService service =
+                new NotificationService(
+                        profileRepo,
+                        mock(UserCredentialRepository.class),
+                        mock(EmailService.class)
+                );
+
+        JobStatusNotificationRequest req = new JobStatusNotificationRequest();
+        req.setUserId(1L);
+        req.setStatus(ApplicationStatus.SELECTED);
+
+        assertThrows(UserNotFound.class,
+                () -> service.sendJobStatusNotification(req));
     }
 }
