@@ -40,7 +40,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ExceptionResponse> handleMethodArgNotValid(MethodArgumentNotValidException ex, HttpServletRequest req) {
+    public ResponseEntity<ExceptionResponse> handleMethodArgNotValid(org.springframework.messaging.handler.annotation.support.MethodArgumentNotValidException ex, HttpServletRequest req) {
         String message = ex.getBindingResult().getFieldErrors()
                 .stream()
                 .map(this::formatFieldError)
