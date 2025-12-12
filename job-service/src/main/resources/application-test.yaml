@@ -17,6 +17,12 @@ spring:
 
   flyway:
     enabled: false
+  task:
+    scheduling:
+      enabled: false
+    # allow bean overriding (keeps tests flexible for mocking)
+    main:
+      allow-bean-definition-overriding: true
 #logging:
 #  level:
 #    org:
