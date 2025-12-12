@@ -38,7 +38,7 @@ class ApplicationCommandServiceTest {
     void apply_jobNotFound_throws() {
         when(jobRepo.findById(5L)).thenReturn(Optional.empty());
 
-        Throwable t = catchThrowable(() -> service.apply("u1", 5L));
+        Throwable t = catchThrowable(() -> service.apply(1L, 5L));
         assertThat(t).isInstanceOf(RuntimeException.class); // or JobNotFoundException if you import it
     }
 
@@ -46,10 +46,10 @@ class ApplicationCommandServiceTest {
     void apply_alreadyApplied_throwsConflict() {
         JobEntity j = JobEntity.builder().jobId(10L).companyName("C").build();
         when(jobRepo.findById(10L)).thenReturn(Optional.of(j));
-        when(applicationRepo.findByJobJobIdAndUserId(10L, "u1"))
-                .thenReturn(Optional.of(ApplicationEntity.builder().applicationId(2L).job(j).userId("u1").build()));
+        when(applicationRepo.findByJobJobIdAndUserId(10L, 1L))
+                .thenReturn(Optional.of(ApplicationEntity.builder().applicationId(2L).job(j).userId(3L).build()));
 
-        Throwable t = catchThrowable(() -> service.apply("u1", 10L));
+        Throwable t = catchThrowable(() -> service.apply(2L, 10L));
         assertThat(t).isInstanceOf(RuntimeException.class); // or ApplicationConflictException
     }
 
@@ -57,15 +57,15 @@ class ApplicationCommandServiceTest {
     void apply_success_savesAndReturns() {
         JobEntity j = JobEntity.builder().jobId(10L).companyName("C").build();
         when(jobRepo.findById(10L)).thenReturn(Optional.of(j));
-        when(applicationRepo.findByJobJobIdAndUserId(10L, "u2")).thenReturn(Optional.empty());
+        when(applicationRepo.findByJobJobIdAndUserId(10L, 1L)).thenReturn(Optional.empty());
 
         ArgumentCaptor<ApplicationEntity> captor = ArgumentCaptor.forClass(ApplicationEntity.class);
-        ApplicationEntity saved = ApplicationEntity.builder().applicationId(100L).job(j).userId("u2").status(ApplicationStatus.PENDING).build();
+        ApplicationEntity saved = ApplicationEntity.builder().applicationId(100L).job(j).userId(1L).status(ApplicationStatus.PENDING).build();
         when(applicationRepo.save(captor.capture())).thenReturn(saved);
 
-        var result = service.apply("u2", 10L);
+        var result = service.apply(1L, 10L);
         assertThat(result.getApplicationId()).isEqualTo(100L);
-        assertThat(captor.getValue().getUserId()).isEqualTo("u2");
+        assertThat(captor.getValue().getUserId()).isEqualTo(1L);
     }
 
     @Test
@@ -83,7 +83,7 @@ class ApplicationCommandServiceTest {
         ApplicationEntity existing = ApplicationEntity.builder()
                 .applicationId(5L)
                 .job(j)                                  // <<-- set job so getJob() != null
-                .userId("u1")
+                .userId(1L)
                 .status(ApplicationStatus.PENDING)
                 .build();
 

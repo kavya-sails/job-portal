@@ -26,7 +26,7 @@ public class ApplicationEntity
     private JobEntity job;
 
     @Column(name = "user_id", nullable = false)
-    private String userId;
+    private Long userId;
 
     @Column(name = "company_name")
     private String companyName;

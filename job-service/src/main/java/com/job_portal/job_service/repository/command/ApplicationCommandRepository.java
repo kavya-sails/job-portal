@@ -7,5 +7,5 @@ import java.util.Optional;
 
 public interface ApplicationCommandRepository extends JpaRepository<ApplicationEntity, Long>
 {
-    Optional<ApplicationEntity> findByJobJobIdAndUserId(Long jobId, String userId);
+    Optional<ApplicationEntity> findByJobJobIdAndUserId(Long jobId, Long userId);
 }

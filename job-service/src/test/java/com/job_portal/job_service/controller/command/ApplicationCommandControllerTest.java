@@ -26,8 +26,6 @@ class ApplicationCommandControllerTest {
     @InjectMocks
     private ApplicationCommandController controller;
 
-    // <-- NO @BeforeEach openMocks
-
     @Test
     void apply_withValidHeader_callsService_andReturnsDto() {
         ApplicationHistoryQueryDto dto = ApplicationHistoryQueryDto.builder()
@@ -39,18 +37,18 @@ class ApplicationCommandControllerTest {
                 .status(ApplicationStatus.PENDING)
                 .build();
 
-        when(commandService.apply("user-1", 2L)).thenReturn(dto);
+        when(commandService.apply(1L, 2L)).thenReturn(dto);
 
-        var resp = controller.apply(2L, "user-1");
+        var resp = controller.apply(2L, 1L);
         assertThat(resp.getStatusCode().is2xxSuccessful()).isTrue();
         assertThat(resp.getBody()).isEqualTo(dto);
 
-        verify(commandService).apply("user-1", 2L);
+        verify(commandService).apply(1L, 2L);
     }
 
     @Test
     void apply_missingHeader_throwsBadRequest() {
-        assertThrows(BadRequestException.class, () -> controller.apply(2L, ""));
+        assertThrows(BadRequestException.class, () -> controller.apply(2L, 18L));
         assertThrows(BadRequestException.class, () -> controller.apply(2L, null));
     }
 

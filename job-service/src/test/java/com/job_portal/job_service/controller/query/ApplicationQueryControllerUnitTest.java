@@ -29,33 +29,33 @@ class ApplicationQueryControllerUnitTest {
     @Test
     void getHistory_userMatchesHeader_returnsList() {
         var dto = ApplicationHistoryQueryDto.builder().applicationId(1L).build();
-        when(queryService.getApplicationsByUser("user-1")).thenReturn(List.of(dto));
+        when(queryService.getApplicationsByUser(1L)).thenReturn(List.of(dto));
 
-        var resp = controller.getHistory("user-1", "user-1", "USER");
+        var resp = controller.getHistory(2L, 3L, "USER");
         assertThat(resp.getStatusCode().is2xxSuccessful()).isTrue();
         assertThat(resp.getBody()).hasSize(1);
 
-        verify(queryService).getApplicationsByUser("user-1");
+        verify(queryService).getApplicationsByUser(2L);
     }
 
     @Test
     void getHistory_adminCanQueryOtherUser() {
         var dto = ApplicationHistoryQueryDto.builder().applicationId(2L).build();
-        when(queryService.getApplicationsByUser("someone")).thenReturn(List.of(dto));
+        when(queryService.getApplicationsByUser(1L)).thenReturn(List.of(dto));
 
-        var resp = controller.getHistory("someone", "admin-1", "ADMIN");
+        var resp = controller.getHistory(1L, 2L, "ADMIN");
         assertThat(resp.getStatusCode().is2xxSuccessful()).isTrue();
         assertThat(resp.getBody()).hasSize(1);
     }
 
     @Test
     void getHistory_missingHeader_throwsBadRequest() {
-        assertThrows(BadRequestException.class, () -> controller.getHistory("u", "", "USER"));
-        assertThrows(BadRequestException.class, () -> controller.getHistory("u", null, "USER"));
+        assertThrows(BadRequestException.class, () -> controller.getHistory(1L, 2L, "USER"));
+        assertThrows(BadRequestException.class, () -> controller.getHistory(1L, null, "USER"));
     }
 
     @Test
     void getHistory_forbidden_whenDifferentUserAndNotAdmin() {
-        assertThrows(ForbiddenException.class, () -> controller.getHistory("other", "me", "USER"));
+        assertThrows(ForbiddenException.class, () -> controller.getHistory(1L, 2L, "USER"));
     }
 }

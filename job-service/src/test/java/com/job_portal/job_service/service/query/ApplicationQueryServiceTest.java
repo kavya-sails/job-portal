@@ -44,18 +44,18 @@ class ApplicationQueryServiceTest {
 
         ApplicationEntity e = ApplicationEntity.builder()
                 .applicationId(10L)
-                .userId("u1")
+                .userId(1L)
                 .appliedDate(Instant.now())
-                .job(job)                // <-- set job here
+                .job(job)
                 .companyName(job.getCompanyName())
                 .build();
 
-        when(repo.findByUserIdOrderByAppliedDateDesc("u1")).thenReturn(List.of(e));
+        when(repo.findByUserIdOrderByAppliedDateDesc(1L)).thenReturn(List.of(e));
 
-        List<ApplicationHistoryQueryDto> list = service.getApplicationsByUser("u1");
+        List<ApplicationHistoryQueryDto> list = service.getApplicationsByUser(1L);
         assertThat(list).hasSize(1);
-        assertThat(list.get(0)).isInstanceOf(ApplicationHistoryQueryDto.class);
-        assertThat(list.get(0).getJobId()).isEqualTo(2L);
-        verify(repo).findByUserIdOrderByAppliedDateDesc("u1");
+        assertThat(list.getFirst()).isInstanceOf(ApplicationHistoryQueryDto.class);
+        assertThat(list.getFirst().getJobId()).isEqualTo(2L);
+        verify(repo).findByUserIdOrderByAppliedDateDesc(1L);
     }
 }

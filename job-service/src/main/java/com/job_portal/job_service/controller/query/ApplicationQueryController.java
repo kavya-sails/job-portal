@@ -6,7 +6,6 @@ import com.job_portal.job_service.exception.MissingUserIdHeaderException;
 import com.job_portal.job_service.service.query.ApplicationQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -17,8 +16,8 @@ public class ApplicationQueryController {
     private final ApplicationQueryService queryService;
 
     @GetMapping("/history/{userId}")
-    public ResponseEntity<List<ApplicationHistoryQueryDto>> getHistory(@PathVariable String userId, @RequestHeader("X-User-Id") String headerUserId, @RequestHeader("X-User-Role") String role) {
-        if (!StringUtils.hasText(headerUserId)) {
+    public ResponseEntity<List<ApplicationHistoryQueryDto>> getHistory(@PathVariable Long userId, @RequestHeader(value = "X-User-Id", required = false) Long headerUserId, @RequestHeader(value = "X-User-Role", required = false) String role) {
+        if (headerUserId == null) {
             throw new MissingUserIdHeaderException();
         }
 

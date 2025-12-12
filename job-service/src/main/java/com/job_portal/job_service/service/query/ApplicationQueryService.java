@@ -16,7 +16,7 @@ public class ApplicationQueryService {
 
     private final ApplicationQueryRepository applicationQueryRepository;
 
-    public List<ApplicationHistoryQueryDto> getApplicationsByUser(String userId) {
+    public List<ApplicationHistoryQueryDto> getApplicationsByUser(Long userId) {
         return applicationQueryRepository.findByUserIdOrderByAppliedDateDesc(userId)
                 .stream()
                 .map(ApplicationCommandMapper::toApplicationHistory)

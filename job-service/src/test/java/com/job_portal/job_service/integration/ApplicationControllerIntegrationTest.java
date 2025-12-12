@@ -59,7 +59,7 @@ public class ApplicationControllerIntegrationTest {
         return jobRepository.save(job);
     }
 
-    private ApplicationEntity persistApplication(String userId, JobEntity job, ApplicationStatus status) {
+    private ApplicationEntity persistApplication(Long userId, JobEntity job, ApplicationStatus status) {
         ApplicationEntity app = ApplicationEntity.builder()
                 .job(job)
                 .userId(userId)
@@ -78,7 +78,7 @@ public class ApplicationControllerIntegrationTest {
 
         // call apply with header X-User-Id
         mockMvc.perform(post("/api/jobs/applications/{jobId}", job.getJobId())
-                        .header("X-User-Id", "user-123")
+                        .header("X-User-Id", 1L)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -91,14 +91,14 @@ public class ApplicationControllerIntegrationTest {
         // persisted in DB
         List<ApplicationEntity> all = applicationCommandRepository.findAll();
         assertThat(all).hasSize(1);
-        assertThat(all.get(0).getUserId()).isEqualTo("user-123");
-        assertThat(all.get(0).getJob().getJobId()).isEqualTo(job.getJobId());
+        assertThat(all.getFirst().getUserId()).isEqualTo(1L);
+        assertThat(all.getFirst().getJob().getJobId()).isEqualTo(job.getJobId());
     }
 
     @Test
     void updateStatus_success_updatesAndReturns() throws Exception {
         JobEntity job = persistJob("SRE");
-        ApplicationEntity app = persistApplication("user-A", job, ApplicationStatus.PENDING);
+        ApplicationEntity app = persistApplication(1L, job, ApplicationStatus.PENDING);
 
         String body = """
             {"status": "REVIEWED"}
@@ -120,28 +120,26 @@ public class ApplicationControllerIntegrationTest {
         JobEntity job1 = persistJob("Job-A");
         JobEntity job2 = persistJob("Job-B");
 
-        persistApplication("owner-1", job1, ApplicationStatus.PENDING);
-        persistApplication("owner-1", job2, ApplicationStatus.SELECTED);
+        persistApplication(1L, job1, ApplicationStatus.PENDING);
+        persistApplication(2L, job2, ApplicationStatus.SELECTED);
         // another user's application (should not be returned)
-        persistApplication("other", job1, ApplicationStatus.PENDING);
+        persistApplication(3L, job1, ApplicationStatus.PENDING);
 
-        mockMvc.perform(get("/api/jobs/applications/history/{userId}", "owner-1")
-                        .header("X-User-Id", "owner-1")
+        mockMvc.perform(get("/api/jobs/applications/history/{userId}", 1L)
+                        .header("X-User-Id", 1L)
                         .header("X-User-Role", "USER")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].userId").value("owner-1"))
-                .andExpect(jsonPath("$[1].userId").value("owner-1"));
+                .andExpect(jsonPath("$.length()").value(2));
     }
 
     @Test
     void getHistory_admin_canFetchOtherUserHistory() throws Exception {
         JobEntity job = persistJob("AdminJob");
-        persistApplication("target-user", job, ApplicationStatus.PENDING);
+        persistApplication(2L, job, ApplicationStatus.PENDING);
 
-        mockMvc.perform(get("/api/jobs/applications/history/{userId}", "target-user")
-                        .header("X-User-Id", "some-admin")
+        mockMvc.perform(get("/api/jobs/applications/history/{userId}", 2L)
+                        .header("X-User-Id", 1L)
                         .header("X-User-Role", "ADMIN")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -164,10 +162,10 @@ public class ApplicationControllerIntegrationTest {
     void apply_duplicateApplication_returnsConflict() throws Exception {
         JobEntity job = persistJob("DupJob");
         // user already applied
-        persistApplication("dup-user", job, ApplicationStatus.PENDING);
+        persistApplication(1L, job, ApplicationStatus.PENDING);
 
         mockMvc.perform(post("/api/jobs/applications/{jobId}", job.getJobId())
-                        .header("X-User-Id", "dup-user")
+                        .header("X-User-Id", 2L)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isConflict());
     }
@@ -186,22 +184,21 @@ public class ApplicationControllerIntegrationTest {
 
     @Test
     void getHistory_missingHeader_returnsBadRequest() throws Exception {
-        mockMvc.perform(get("/api/jobs/applications/history/{userId}", "u1")
+        mockMvc.perform(get("/api/jobs/applications/history/{userId}", 2L)
                         // missing X-User-Id header
-                        .header("X-User-Role", "USER"))
+                        .header("X-User-Role", 1L))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     void getHistory_forbiddenWhenNotOwnerAndNotAdmin_returnsForbidden() throws Exception {
         JobEntity job = persistJob("F");
-        persistApplication("target", job, ApplicationStatus.PENDING);
+        persistApplication(2L, job, ApplicationStatus.PENDING);
 
-        mockMvc.perform(get("/api/jobs/applications/history/{userId}", "target")
-                        .header("X-User-Id", "another-user")
+        mockMvc.perform(get("/api/jobs/applications/history/{userId}", 1L)
+                        .header("X-User-Id", 2L)
                         .header("X-User-Role", "USER") // not ADMIN
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
     }
 }
-

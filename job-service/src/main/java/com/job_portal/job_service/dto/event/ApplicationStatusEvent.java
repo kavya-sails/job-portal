@@ -13,7 +13,7 @@ import java.io.Serializable;
 @Builder
 public class ApplicationStatusEvent implements Serializable {
     private Long applicationId;
-    private String userId;
+    private Long userId;
     private Long jobId;
     private String jobTitle;
     private ApplicationStatus status;

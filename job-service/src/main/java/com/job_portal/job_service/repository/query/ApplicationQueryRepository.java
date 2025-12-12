@@ -9,5 +9,5 @@ import java.util.List;
 
 public interface ApplicationQueryRepository extends JpaRepository<ApplicationEntity, Long>
 {
-    List<ApplicationEntity> findByUserIdOrderByAppliedDateDesc(String userId);
+    List<ApplicationEntity> findByUserIdOrderByAppliedDateDesc(Long userId);
 }

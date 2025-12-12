@@ -30,7 +30,7 @@ public class TestDataFactory {
         return ApplicationEntity.builder()
                 .applicationId(11L)
                 .job(job)
-                .userId("user-1")
+                .userId(1L)
                 .companyName(job.getCompanyName())
                 .appliedDate(Instant.now())
                 .status(ApplicationStatus.PENDING)

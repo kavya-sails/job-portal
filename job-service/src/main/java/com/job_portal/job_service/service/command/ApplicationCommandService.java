@@ -28,7 +28,7 @@ public class ApplicationCommandService {
     private final ApplicationStatusPublisher statusPublisher;
 
     @Transactional
-    public ApplicationHistoryQueryDto apply(String userId, Long jobId) {
+    public ApplicationHistoryQueryDto apply(Long userId, Long jobId) {
         JobEntity job = jobQueryRepository.findById(jobId)
                 .orElseThrow(() -> new JobNotFoundException(jobId));
 
