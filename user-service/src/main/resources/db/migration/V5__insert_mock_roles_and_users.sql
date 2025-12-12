@@ -1,5 +1,4 @@
-INSERT INTO roles (role_name)
-VALUES
+INSERT INTO roles (role_name) VALUES
     ('ADMIN'),
     ('RECRUITER'),
     ('USER');
@@ -10,39 +9,39 @@ VALUES
     'admin@jobportal.com',
     '{noop}password',
     1,
-    1,
-    NOW(),
-    NOW()
+    TRUE,
+    CURRENT_TIMESTAMP,
+    CURRENT_TIMESTAMP
 ),
 (
     'pavan.kalyan@gmail.com',
     '$2a$10$7EqJtq98hPqEX7fNZaFWoOhi5Qf5cCBw7O3ZXk4Br5qv4QF6n1r9m',
     2,
-    1,
-    NOW(),
-    NOW()
+    TRUE,
+    CURRENT_TIMESTAMP,
+    CURRENT_TIMESTAMP
 ),
 (
     'rahul.shetty@gmail.com',
     '$2a$10$7EqJtq98hPqEX7fNZaFWoOhi5Qf5cCBw7O3ZXk4Br5qv4QF6n1r9m',
     2,
-    1,
-    NOW(),
-    NOW()
+    TRUE,
+    CURRENT_TIMESTAMP,
+    CURRENT_TIMESTAMP
 ),
 (
     'sneha.reddy@gmail.com',
     '$2a$10$7EqJtq98hPqEX7fNZaFWoOhi5Qf5cCBw7O3ZXk4Br5qv4QF6n1r9m',
     2,
-    1,
-    NOW(),
-    NOW()
+    TRUE,
+    CURRENT_TIMESTAMP,
+    CURRENT_TIMESTAMP
 ),
 (
     'arjun.kumar@gmail.com',
     '$2a$10$7EqJtq98hPqEX7fNZaFWoOhi5Qf5cCBw7O3ZXk4Br5qv4QF6n1r9m',
     2,
-    1,
-    NOW(),
-    NOW()
+    TRUE,
+    CURRENT_TIMESTAMP,
+    CURRENT_TIMESTAMP
 );

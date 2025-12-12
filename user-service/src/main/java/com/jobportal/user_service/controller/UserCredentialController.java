@@ -16,16 +16,19 @@ import java.util.List;
 public class UserCredentialController {
     private final UserCredentialService userCredentialService;
 
+    // user register
     @PostMapping("/register")
     public ResponseEntity<String> register(@Valid @RequestBody RegisterRequest request) {
         return ResponseEntity.ok(userCredentialService.register(request));
     }
 
+    // user login
     @PostMapping("/login")
     public ResponseEntity<String>  login(@Valid @RequestBody LoginRequest request) {
         return ResponseEntity.ok(userCredentialService.login(request));
     }
 
+    // fetch all users
     @GetMapping
     public List<UserCredential> getAllUsers() {
         return userCredentialService.findAll();

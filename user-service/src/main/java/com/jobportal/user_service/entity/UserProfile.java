@@ -21,8 +21,6 @@ public class UserProfile {
     @Column(name = "id")
     private Long id;
 
-    // -------------------- BASIC INFO --------------------
-
     @Column(name = "first_name", nullable = false, length = 50)
     private String firstName;
 
@@ -55,8 +53,6 @@ public class UserProfile {
     @Column(name = "profile_completion_percentage")
     private Integer profileCompletionPercentage;
 
-    // -------------------- RESUME & LINKS --------------------
-
     // NOT NULL in DB as per requirement
     @Column(name = "resume_url", nullable = false, length = 255)
     private String resumeUrl;
@@ -70,20 +66,14 @@ public class UserProfile {
     @Column(name = "linkedin_url", length = 255)
     private String linkedinUrl;
 
-    // -------------------- EDUCATION --------------------
-
     @OneToOne(mappedBy = "userProfile", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private UserEducation education;
-
-    // -------------------- AUDIT --------------------
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
-
-    // -------------------- LIFECYCLE CALLBACKS --------------------
 
     @PrePersist
     protected void onCreate() {

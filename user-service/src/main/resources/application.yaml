@@ -6,10 +6,10 @@ spring:
     name: user-service
 
   datasource:
-    url: jdbc:mysql://localhost:3306/job_portal_user
-    username: root
-    password: root
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:postgresql://localhost:5432/job_portal_user
+    username: postgres
+    password: 12345678
+    driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
