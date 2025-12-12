@@ -3,6 +3,7 @@ package com.jobportal.user_service.controller;
 import com.jobportal.user_service.dto.LoginRequest;
 import com.jobportal.user_service.dto.RegisterRequest;
 import com.jobportal.user_service.entity.UserCredential;
+import com.jobportal.user_service.exception.UserAlreadyExistsException;
 import com.jobportal.user_service.service.UserCredentialService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -27,7 +28,7 @@ public class UserCredentialController {
             description = "Creates a new user using email and password, saves encrypted password."
     )
     @PostMapping("/register")
-    public ResponseEntity<String> register(@Valid @RequestBody RegisterRequest request) {
+    public ResponseEntity<String> register(@Valid @RequestBody RegisterRequest request) throws UserAlreadyExistsException {
         return ResponseEntity.ok(userCredentialService.register(request));
     }
 

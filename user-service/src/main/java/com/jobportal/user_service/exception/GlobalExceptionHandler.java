@@ -34,6 +34,11 @@ public class GlobalExceptionHandler {
         return buildError(HttpStatus.FORBIDDEN, "Forbidden", ex.getMessage(), req);
     }
 
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<ExceptionResponse> handleUserAlreadyExistsException(UserAlreadyExistsException ex, HttpServletRequest req) {
+        return buildError(HttpStatus.CONFLICT, "Conflict", ex.getMessage(), req);
+    }
+
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ExceptionResponse> handleBadCredentials(BadCredentialsException ex, HttpServletRequest req) {
         return buildError(HttpStatus.UNAUTHORIZED, "Unauthorized", "Invalid email or password", req);

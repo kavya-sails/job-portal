@@ -4,6 +4,7 @@ import com.jobportal.user_service.dto.LoginRequest;
 import com.jobportal.user_service.dto.RegisterRequest;
 import com.jobportal.user_service.entity.UserCredential;
 import com.jobportal.user_service.enums.RoleName;
+import com.jobportal.user_service.exception.UserAlreadyExistsException;
 import com.jobportal.user_service.service.UserCredentialService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,21 +43,19 @@ class UserCredentialControllerTest {
         loginRequest.setPassword("Password@123");
     }
 
-    // REGISTER USER
     @Test
-    void testRegisterUser() {
+    void testRegisterUser() throws UserAlreadyExistsException {
         when(userCredentialService.register(registerRequest))
                 .thenReturn("User registered successfully");
 
         ResponseEntity<String> response =
                 userCredentialController.register(registerRequest);
 
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(200, response.getStatusCode().value());
         assertEquals("User registered successfully", response.getBody());
         verify(userCredentialService, times(1)).register(registerRequest);
     }
 
-    // LOGIN USER
     @Test
     void testLoginUser() {
         when(userCredentialService.login(loginRequest))
@@ -65,12 +64,11 @@ class UserCredentialControllerTest {
         ResponseEntity<String> response =
                 userCredentialController.login(loginRequest);
 
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(200, response.getStatusCode().value());
         assertEquals("Login successful", response.getBody());
         verify(userCredentialService, times(1)).login(loginRequest);
     }
 
-    // GET ALL USERS
     @Test
     void testGetAllUsers() {
         UserCredential user = new UserCredential();
@@ -83,7 +81,7 @@ class UserCredentialControllerTest {
         List<UserCredential> result = userCredentialController.getAllUsers();
 
         assertEquals(1, result.size());
-        assertEquals("test@example.com", result.get(0).getEmail());
+        assertEquals("test@example.com", result.getFirst().getEmail());
         verify(userCredentialService, times(1)).findAll();
     }
 }

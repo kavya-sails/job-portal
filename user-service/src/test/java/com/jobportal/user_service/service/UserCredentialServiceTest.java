@@ -4,6 +4,7 @@ import com.jobportal.user_service.dto.LoginRequest;
 import com.jobportal.user_service.dto.RegisterRequest;
 import com.jobportal.user_service.entity.Role;
 import com.jobportal.user_service.entity.UserCredential;
+import com.jobportal.user_service.exception.UserAlreadyExistsException;
 import com.jobportal.user_service.repository.RoleRepository;
 import com.jobportal.user_service.repository.UserCredentialRepository;
 import org.junit.jupiter.api.Test;
@@ -20,7 +21,7 @@ import static org.mockito.Mockito.*;
 class UserCredentialServiceTest {
 
     @Test
-    void register_whenEmailExists_shouldReturnMessage() {
+    void register_whenEmailExists_shouldReturnException() {
         UserCredentialRepository repo = mock(UserCredentialRepository.class);
         when(repo.existsByEmail("a@mail.com")).thenReturn(true);
 
@@ -35,8 +36,11 @@ class UserCredentialServiceTest {
 
         RegisterRequest req = new RegisterRequest();
         req.setEmail("a@mail.com");
-
-        assertEquals("Email already exists", service.register(req));
+        UserAlreadyExistsException ex = assertThrows(
+                UserAlreadyExistsException.class,
+                () -> service.register(req)
+        );
+        assertEquals("User with email a@mail.com already exists", ex.getMessage());
     }
 
     @Test

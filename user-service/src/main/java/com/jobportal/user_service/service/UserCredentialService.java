@@ -4,6 +4,7 @@ import com.jobportal.user_service.dto.LoginRequest;
 import com.jobportal.user_service.dto.RegisterRequest;
 import com.jobportal.user_service.entity.UserCredential;
 import com.jobportal.user_service.entity.Role;
+import com.jobportal.user_service.exception.UserAlreadyExistsException;
 import com.jobportal.user_service.repository.UserCredentialRepository;
 import com.jobportal.user_service.repository.RoleRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,9 +24,9 @@ public class UserCredentialService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
-    public String register(RegisterRequest request) {
+    public String register(RegisterRequest request) throws UserAlreadyExistsException {
         if (userCredentialRepository.existsByEmail(request.getEmail())) {
-            return "Email already exists";
+            throw new UserAlreadyExistsException("User with email " + request.getEmail() + " already exists");
         }
         Role role = roleRepository.findByRoleName(request.getRoleName())
                 .orElseThrow(() -> new RuntimeException("Role not found"));
@@ -58,7 +59,6 @@ public class UserCredentialService {
         throw new RuntimeException("Invalid email or password");
     }
 
-    //  FETCH ALL USERS
     public List<UserCredential> findAll() {
         return userCredentialRepository.findAll();
     }
