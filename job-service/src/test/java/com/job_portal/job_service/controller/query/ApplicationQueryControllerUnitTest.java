@@ -1,10 +1,9 @@
 package com.job_portal.job_service.controller.query;
 
 import com.job_portal.job_service.dto.query.ApplicationHistoryQueryDto;
-import com.job_portal.job_service.exception.BadRequestException;
 import com.job_portal.job_service.exception.ForbiddenException;
 import com.job_portal.job_service.service.query.ApplicationQueryService;
-import org.junit.jupiter.api.BeforeEach;
+import jakarta.ws.rs.BadRequestException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
