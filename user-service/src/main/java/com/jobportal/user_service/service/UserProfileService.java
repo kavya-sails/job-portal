@@ -14,206 +14,169 @@ import com.jobportal.user_service.mapper.UserEducationMapper;
 import com.jobportal.user_service.mapper.UserProfileMapper;
 import com.jobportal.user_service.repository.UserCredentialRepository;
 import com.jobportal.user_service.repository.UserProfileRepository;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
 public class UserProfileService {
-
     private final UserProfileRepository userProfileRepository;
     private final UserCredentialRepository userCredentialRepository;
     private final UserProfileMapper userProfileMapper;
     private final UserEducationMapper userEducationMapper;
-    public UserProfileResponseDto createUserProfile(UserProfileRequestDto dto, Long headerUserId) {
 
+    @Transactional
+    public UserProfileResponseDto createUserProfile(UserProfileRequestDto dto, Long headerUserId) {
         // Prevent duplicate profiles for same auth user
         if (userProfileRepository.existsById(headerUserId)) {
-            throw new DataIntegrityViolationException(
-                    "User profile already exists for userId: " + headerUserId
-            );
+            throw new DataIntegrityViolationException("User profile already exists for userId: " + headerUserId);
         }
-
-        // Ensure AuthUser exists
-        UserCredential authUser = userCredentialRepository.findById(headerUserId)
-                .orElseThrow(() -> new UserNotFound(
-                        "Auth user not found with id: " + headerUserId
-                ));
-
-        try {
-            // Map request DTO to entity
-            UserProfile userProfile = userProfileMapper.toEntity(dto);
-            userProfile.setId(authUser.getUserId());
-            recalculateProfileCompletion(userProfile);
-            UserProfile saved = userProfileRepository.save(userProfile);
-            // Map entity to response DTO and attach email from AuthUser
-            UserProfileResponseDto response = userProfileMapper.toResponseDto(saved);
-            response.setEmail(authUser.getEmail());
-
-            return response;
-
-        } catch (org.springframework.dao.DataIntegrityViolationException ex) {
-            throw new DataIntegrityViolationException(
-                    "Profile violates a data constraint"
-            );
+        UserCredential authUser = fetchAuthUserOrThrow(headerUserId);
+        UserProfile profile = userProfileMapper.toEntity(dto);
+        profile.setId(authUser.getUserId());
+        // handle education if present in DTO
+        if (dto.getEducation() != null) {
+            UserEducation edu = userEducationMapper.toEntity(dto.getEducation());
+            edu.setUserProfile(profile);
+            profile.setEducation(edu);
         }
+        recalculateProfileCompletion(profile);
+        UserProfile saved = userProfileRepository.save(profile);
+        return buildResponseWithEmail(saved, authUser.getEmail());
     }
 
     public UserProfileResponseDto getUserProfileById(Long pathId, Long headerUserId) {
-
-        if (!pathId.equals(headerUserId)) {
-            throw new ForbiddenException(
-                    "You are not allowed to access this profile"
-            );
-        }
-
+        ensureOwner(pathId, headerUserId);
         UserProfile userProfile = userProfileRepository.findById(pathId)
-                .orElseThrow(() ->
-                        new UserProfileNotFoundException("User profile not found with id: " + pathId)
-                );
-        UserCredential authUser = userCredentialRepository.findById(pathId)
-                .orElseThrow(() -> new UserNotFound(
-                        "Auth user not found with id: " + pathId
-                ));
-        UserProfileResponseDto response = userProfileMapper.toResponseDto(userProfile);
-        response.setEmail(authUser.getEmail());
-        return response;
+                .orElseThrow(() -> new UserProfileNotFoundException("User profile not found with id: " + pathId));
+
+        String email = fetchAuthUserEmail(headerUserId);
+        return buildResponseWithEmail(userProfile, email);
     }
 
     public List<UserProfileResponseDto> getAllUserProfiles() {
         List<UserProfile> users = userProfileRepository.findAll();
-        List<UserProfileResponseDto> responseList = userProfileMapper.toResponseDTOList(users);
-
-        // Attach email for each profile from AuthUser
-        for (UserProfileResponseDto resp : responseList) {
-            userCredentialRepository.findById(resp.getId()).ifPresent(
-                    authUser -> resp.setEmail(authUser.getEmail())
-            );
-        }
-        return responseList;
+        return users.stream()
+                .map(up -> buildResponseWithEmail(up, fetchAuthUserEmail(up.getId())))
+                .collect(Collectors.toList());
     }
 
+    @Transactional
     public void deleteUserProfileById(Long pathId, Long headerUserId) {
-
-        if (!pathId.equals(headerUserId)) {
-            throw new ForbiddenException(
-                    "You are not allowed to delete this profile"
-            );
-        }
+        ensureOwner(pathId, headerUserId);
         UserProfile userProfile = userProfileRepository.findById(pathId)
-                .orElseThrow(() ->
-                        new UserProfileNotFoundException("User profile not found with id: " + pathId)
-                );
-
+                .orElseThrow(() -> new UserProfileNotFoundException("User profile not found with id: " + pathId));
         userProfileRepository.delete(userProfile);
     }
 
+    @Transactional
     public UserProfileResponseDto updateUserProfile(Long pathId, Long headerUserId, UserProfileRequestDto dto) {
-        if (!pathId.equals(headerUserId)) {
-            throw new ForbiddenException(
-                    "You are not allowed to update this profile"
-            );
-        }
+        ensureOwner(pathId, headerUserId);
         UserProfile userProfile = userProfileRepository.findById(pathId)
-                .orElseThrow(() ->
-                        new UserProfileNotFoundException("User profile not found with id: " + pathId)
-                );
+                .orElseThrow(() -> new UserProfileNotFoundException("User profile not found with id: " + pathId));
 
         String oldResumeUrl = userProfile.getResumeUrl();
-        UserCredential authUser = userCredentialRepository.findById(pathId)
-                .orElseThrow(() -> new UserNotFound(
-                        "Auth user not found with id: " + pathId
-                ));
-        try {
-            // Map scalar fields, but NOT education (we ignored it in mapper)
-            userProfileMapper.updateEntityFromDto(dto, userProfile);
+        UserCredential authUser = fetchAuthUserOrThrow(pathId);
 
-            if (dto.getEducation() != null) {
-                if (userProfile.getEducation() == null) {
-                    // no education yet -> create new
-                    UserEducation edu = userEducationMapper.toEntity(dto.getEducation());
-                    edu.setUserProfile(userProfile);        // for @MapsId
-                    userProfile.setEducation(edu);
-                } else {
-                    // update existing education in-place
-                    userEducationMapper.updateEntityFromDto(
-                            dto.getEducation(),
-                            userProfile.getEducation()
-                    );
-                }
-            }
-            updateResumeTimestampIfChanged(oldResumeUrl, userProfile.getResumeUrl(), userProfile);
-            recalculateProfileCompletion(userProfile);
-            UserProfile updatedUser = userProfileRepository.save(userProfile);
-            UserProfileResponseDto response = userProfileMapper.toResponseDto(updatedUser);
-            response.setEmail(authUser.getEmail());
-            return response;
-        } catch (org.springframework.dao.DataIntegrityViolationException ex) {
-            // optionally log the root cause to see exact DB error
-            // ex.getMostSpecificCause().printStackTrace();
-            throw new DataIntegrityViolationException(
-                    "Profile violates a data constraint"
-            );
+        // apply changes (scalars + education)
+        applyProfileChangesFromRequest(dto, userProfile);
+
+        updateResumeTimestampIfChanged(oldResumeUrl, userProfile.getResumeUrl(), userProfile);
+        recalculateProfileCompletion(userProfile);
+
+        UserProfile updated = userProfileRepository.save(userProfile);
+        return buildResponseWithEmail(updated, authUser.getEmail());
+    }
+
+    @Transactional
+    public UserProfileResponseDto partialUpdateUserProfile(Long pathId, Long headerUserId, UserProfilePartialUpdateDto dto) {
+        ensureOwner(pathId, headerUserId);
+        UserProfile userProfile = userProfileRepository.findById(pathId)
+                .orElseThrow(() -> new UserProfileNotFoundException("User profile not found with id: " + pathId));
+
+        String oldResumeUrl = userProfile.getResumeUrl();
+        UserCredential authUser = fetchAuthUserOrThrow(pathId);
+
+        // patch scalars and education
+        userProfileMapper.patchEntityFromDto(dto, userProfile);
+        if (dto.getEducation() != null) {
+            applyEducationPatch(dto, userProfile);
+        }
+
+        updateResumeTimestampIfChanged(oldResumeUrl, userProfile.getResumeUrl(), userProfile);
+        recalculateProfileCompletion(userProfile);
+
+        UserProfile updated = userProfileRepository.save(userProfile);
+        return buildResponseWithEmail(updated, authUser.getEmail());
+    }
+
+    private void applyProfileChangesFromRequest(UserProfileRequestDto dto, UserProfile userProfile) {
+        // map simple scalar fields (mapper ignores education per original)
+        userProfileMapper.updateEntityFromDto(dto, userProfile);
+
+        if (dto.getEducation() != null) {
+            applyEducationUpdate(dto, userProfile);
         }
     }
 
-    public UserProfileResponseDto partialUpdateUserProfile(Long pathId, Long headerUserId, UserProfilePartialUpdateDto dto) {
-        if (!pathId.equals(headerUserId)) {
-            throw new ForbiddenException(
-                    "You are not allowed to update this profile"
-            );
+    private void applyEducationUpdate(UserProfileRequestDto dto, UserProfile userProfile) {
+        if (userProfile.getEducation() == null) {
+            UserEducation edu = userEducationMapper.toEntity(dto.getEducation());
+            edu.setUserProfile(userProfile);
+            userProfile.setEducation(edu);
+        } else {
+            userEducationMapper.updateEntityFromDto(dto.getEducation(), userProfile.getEducation());
         }
-        UserProfile userProfile = userProfileRepository.findById(pathId)
-                .orElseThrow(() ->
-                        new UserProfileNotFoundException("User profile not found with id: " + pathId)
-                );
-        String oldResumeUrl = userProfile.getResumeUrl();
-        UserCredential authUser = userCredentialRepository.findById(pathId)
-                .orElseThrow(() -> new UserNotFound(
-                        "Auth user not found with id: " + pathId
-                ));
-        try {
-            userProfileMapper.patchEntityFromDto(dto, userProfile);
+    }
 
-            // handle education in PATCH as well
-            if (dto.getEducation() != null) {
-                if (userProfile.getEducation() == null) {
-                    UserEducation edu = userEducationMapper.toEntity(dto.getEducation());
-                    edu.setUserProfile(userProfile);
-                    userProfile.setEducation(edu);
-                } else {
-                    userEducationMapper.updateEntityFromDto(
-                            dto.getEducation(),
-                            userProfile.getEducation()
-                    );
-                }
-            }
-            updateResumeTimestampIfChanged(oldResumeUrl, userProfile.getResumeUrl(), userProfile);
-            recalculateProfileCompletion(userProfile);
-            UserProfile updatedUser = userProfileRepository.save(userProfile);
-            UserProfileResponseDto response = userProfileMapper.toResponseDto(updatedUser);
-            response.setEmail(authUser.getEmail());
-            return response;
+    private void applyEducationPatch(UserProfilePartialUpdateDto dto, UserProfile userProfile) {
+        if (userProfile.getEducation() == null) {
+            UserEducation edu = userEducationMapper.toEntity(dto.getEducation());
+            edu.setUserProfile(userProfile);
+            userProfile.setEducation(edu);
+        } else {
+            userEducationMapper.updateEntityFromDto(dto.getEducation(), userProfile.getEducation());
+        }
+    }
 
-        } catch (org.springframework.dao.DataIntegrityViolationException ex) {
-            throw new DataIntegrityViolationException(
-                    "Profile violates a data constraint"
-            );
+    private void ensureOwner(Long pathId, Long headerUserId) {
+        if (!Objects.equals(pathId, headerUserId)) {
+            throw new ForbiddenException("You are not allowed to access this profile");
+        }
+    }
+
+    private UserCredential fetchAuthUserOrThrow(Long userId) {
+        return userCredentialRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFound("Auth user not found for id: " + userId));
+    }
+
+    private String fetchAuthUserEmail(Long userId) {
+        return userCredentialRepository.findById(userId).map(UserCredential::getEmail).orElse(null);
+    }
+
+    private UserProfileResponseDto buildResponseWithEmail(UserProfile userProfile, String email) {
+        UserProfileResponseDto response = userProfileMapper.toResponseDto(userProfile);
+        response.setEmail(email);
+        return response;
+    }
+
+    private void updateResumeTimestampIfChanged(String oldUrl, String newUrl, UserProfile profile) {
+        if (newUrl != null && !newUrl.equals(oldUrl)) {
+            profile.setResumeUploadedAt(LocalDateTime.now());
         }
     }
 
     private void recalculateProfileCompletion(UserProfile profile) {
-        int percentage = calculateProfileCompletionPercentage(profile);
-        profile.setProfileCompletionPercentage(percentage);
+        profile.setProfileCompletionPercentage(calculateProfileCompletionPercentage(profile));
     }
-    private int calculateProfileCompletionPercentage(UserProfile profile) {
 
+    private int calculateProfileCompletionPercentage(UserProfile profile) {
         Stream<Object> profileFields = Stream.of(
                 profile.getFirstName(),
                 profile.getLastName(),
@@ -239,7 +202,7 @@ public class UserProfileService {
                 edu.getPercentage()
         );
 
-        List<Object> allFields = Stream.concat(profileFields, educationFields).toList();
+        List<Object> allFields = Stream.concat(profileFields, educationFields).collect(Collectors.toList());
         long total = allFields.size();
         if (total == 0) return 0;
         long filled = allFields.stream()
@@ -247,14 +210,9 @@ public class UserProfileService {
                 .count();
         return (int) Math.round((filled * 100.0) / total);
     }
-    private void updateResumeTimestampIfChanged(String oldUrl, String newUrl, UserProfile profile) {
-        if (newUrl != null && !newUrl.equals(oldUrl)) {
-            profile.setResumeUploadedAt(LocalDateTime.now());
-        }
-    }
+
     public void checkUserExists(Long userId) {
-        boolean exists = userProfileRepository.existsById(userId);
-        if (!exists) {
+        if (!userProfileRepository.existsById(userId)) {
             throw new UserNotFound("User must create profile or user must have a profile");
         }
     }
