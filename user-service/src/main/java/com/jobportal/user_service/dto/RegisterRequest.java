@@ -22,6 +22,7 @@ public class RegisterRequest {
             message = "Password must contain at least one uppercase, one lowercase, one digit, and one special character"
     )
     private String password;
+
     @NotNull(message = "Role is required")
     private RoleName roleName;
 }
