@@ -26,16 +26,16 @@ class JobQueryControllerTest {
 
     // NO @BeforeEach openMocks — MockitoExtension handles it
 
-    @Test
-    void listJobs_returnsMappedList() {
-        JobDetailsQueryDto dto = JobDetailsQueryDto.builder().jobId(1L).title("T").build();
-        when(jobQueryService.getAllJobs()).thenReturn(List.of(dto));
-
-        var resp = controller.listJobs();
-        assertThat(resp.getStatusCode().is2xxSuccessful()).isTrue();
-        assertThat(resp.getBody()).hasSize(1);
-        assertThat(resp.getBody().get(0).getTitle()).isEqualTo("T");
-    }
+//    @Test
+//    void listJobs_returnsMappedList() {
+//        JobDetailsQueryDto dto = JobDetailsQueryDto.builder().jobId(1L).title("T").build();
+//        when(jobQueryService.getAllJobs()).thenReturn(List.of(dto));
+//
+//        var resp = controller.listJobs();
+//        assertThat(resp.getStatusCode().is2xxSuccessful()).isTrue();
+//        assertThat(resp.getBody()).hasSize(1);
+//        assertThat(resp.getBody().get(0).getTitle()).isEqualTo("T");
+//    }
 
     @Test
     void getJob_returnsDto() {

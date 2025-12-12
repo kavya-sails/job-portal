@@ -26,10 +26,10 @@ CREATE INDEX idx_jobs_expiry ON jobs (expires_at);
 CREATE TABLE applications (
                               application_id BIGSERIAL PRIMARY KEY,
                               job_id BIGINT NOT NULL REFERENCES jobs(job_id) ON DELETE CASCADE,
-                              user_id VARCHAR(100) NOT NULL,
+                              user_id BIGINT NOT NULL,
                               company_name VARCHAR(255) NOT NULL,
 
-                              applied_date TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
+                               applied_date TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW(),
 
                               status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
                               CONSTRAINT uq_job_user UNIQUE (job_id, user_id)
