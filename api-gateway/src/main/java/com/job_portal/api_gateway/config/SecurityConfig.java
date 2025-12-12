@@ -35,7 +35,7 @@ public class SecurityConfig {
                 .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers("/api/users/login", "/api/users/register", "/actuator/**").permitAll()
-                        .pathMatchers("/api/users").hasRole(Role.ADMIN.name())
+                        .pathMatchers("/api/users", "/api/users/profile/all").hasRole(Role.ADMIN.name())
                         .pathMatchers(HttpMethod.POST,"/api/jobs/applications/{jobId}").hasAnyRole(Role.USER.name())
                         .pathMatchers(HttpMethod.PUT,"/api/jobs/applications/{applicationId}/status").hasAnyRole(Role.RECRUITER.name())
                         .pathMatchers(HttpMethod.GET,"/api/jobs/applications/history/{userId}").hasAnyRole("ADMIN","USER")
