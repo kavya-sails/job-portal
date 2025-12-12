@@ -8,9 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import java.util.List;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
@@ -26,13 +24,10 @@ class ApplicationQueryControllerUnitTest {
 
     @Test
     void getHistory_userMatchesHeader_returnsList() {
-        // When path user id == header user id and role is USER => should succeed
         var dto = ApplicationHistoryQueryDto.builder().applicationId(1L).build();
 
-        // controller will call queryService.getApplicationsByUser(pathUserId)
         when(queryService.getApplicationsByUser(2L)).thenReturn(List.of(dto));
 
-        // pathUserId = 2L, headerUserId = 2L, role = "USER"
         var resp = controller.getHistory(2L, 2L, "USER");
         assertThat(resp.getStatusCode().is2xxSuccessful()).isTrue();
         assertThat(resp.getBody()).hasSize(1);
@@ -42,11 +37,9 @@ class ApplicationQueryControllerUnitTest {
 
     @Test
     void getHistory_adminCanQueryOtherUser() {
-        // Admin header can query other user's history (pathUserId = 1L).
         var dto = ApplicationHistoryQueryDto.builder().applicationId(2L).build();
         when(queryService.getApplicationsByUser(1L)).thenReturn(List.of(dto));
 
-        // pathUserId = 1L, headerUserId = 2L (different), role = "ADMIN"
         var resp = controller.getHistory(1L, 2L, "ADMIN");
         assertThat(resp.getStatusCode().is2xxSuccessful()).isTrue();
         assertThat(resp.getBody()).hasSize(1);

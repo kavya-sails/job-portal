@@ -26,12 +26,10 @@ class RabbitMQConfigTest {
         assertThat(binding.getExchange()).isEqualTo(RabbitMQConfig.EXCHANGE);
         assertThat(binding.getRoutingKey()).isEqualTo(RabbitMQConfig.ROUTING_KEY);
 
-        // message converter
         ObjectMapper mapper = new ObjectMapper();
         var converter = cfg.messageConverter(mapper);
         assertThat(converter).isNotNull();
 
-        // rabbitTemplate: create a mock ConnectionFactory - RabbitTemplate will be created with it
         var connectionFactory = mock(org.springframework.amqp.rabbit.connection.ConnectionFactory.class);
         RabbitTemplate template = cfg.rabbitTemplate(connectionFactory, converter);
         assertThat(template).isNotNull();

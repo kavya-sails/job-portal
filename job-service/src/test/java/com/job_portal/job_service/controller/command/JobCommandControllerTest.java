@@ -24,10 +24,7 @@ class JobCommandControllerTest {
 
     @InjectMocks
     private JobCommandController controller;
-
-    // real exception handler instance (we call it directly)
     private GlobalExceptionHandler globalExceptionHandler;
-
     private static Validator validator;
 
     @BeforeAll
@@ -43,7 +40,6 @@ class JobCommandControllerTest {
 
     @Test
     void createJob_valid_invokesService_andReturnsDto() {
-        // Build a DTO that satisfies bean validation constraints
         JobCommandDto dto = JobCommandDto.builder()
                 .title("Valid Title")
                 .description("This description has at least twenty characters.")
@@ -64,11 +60,9 @@ class JobCommandControllerTest {
 
         when(jobCommandService.createJob(any(JobCommandDto.class))).thenReturn(returned);
 
-        // Validate DTO first - should be no violations
         Set<ConstraintViolation<JobCommandDto>> violations = validator.validate(dto);
         assertThat(violations).isEmpty();
 
-        // Call controller directly (since DTO valid)
         var resp = controller.createJob(dto);
         assertThat(resp.getStatusCode().is2xxSuccessful()).isTrue();
         assertThat(resp.getBody()).isEqualTo(returned);

@@ -60,7 +60,6 @@ public class RepositoryAndSchedulerTests {
                 .status(ApplicationStatus.PENDING)
                 .build();
 
-        // H2 + Hibernate should raise DataIntegrityViolationException for unique constraint violation
         assertThrows(DataIntegrityViolationException.class, () -> appRepo.saveAndFlush(a2));
     }
 }

@@ -47,7 +47,6 @@ class ApplicationCommandServiceTest {
 
     @BeforeEach
     void setUp() {
-        // global default: make user-client a no-op (void method)
         doNothing().when(userClient).checkUserExists(anyLong());
     }
 

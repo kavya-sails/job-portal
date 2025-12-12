@@ -4,7 +4,6 @@ import com.job_portal.job_service.config.RabbitMQConfig;
 import com.job_portal.job_service.dto.event.ApplicationStatusEvent;
 import org.junit.jupiter.api.Test;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-
 import static org.mockito.Mockito.*;
 
 class ApplicationStatusPublisherTest {

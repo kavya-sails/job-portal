@@ -26,7 +26,6 @@ class ApplicationCommandControllerTest {
 
     @Test
     void apply_withValidHeader_callsService_andReturnsDto() {
-        // Build DTO expected from service
         ApplicationHistoryQueryDto dto = ApplicationHistoryQueryDto.builder()
                 .applicationId(1L)
                 .jobId(2L)
@@ -36,10 +35,9 @@ class ApplicationCommandControllerTest {
                 .status(ApplicationStatus.PENDING)
                 .build();
 
-        // Controller passes (userId, jobId) to service, so stub accordingly
         when(commandService.apply(1L, 2L)).thenReturn(dto);
 
-        var resp = controller.apply(2L, 1L); // jobId = 2L, userId = 1L
+        var resp = controller.apply(2L, 1L);
         assertThat(resp.getStatusCode().is2xxSuccessful()).isTrue();
         assertThat(resp.getBody()).isEqualTo(dto);
 
@@ -48,13 +46,11 @@ class ApplicationCommandControllerTest {
 
     @Test
     void apply_missingHeader_null_throwsBadRequest() {
-        // Only null header should throw BadRequestException (controller behaviour)
         assertThrows(MissingUserIdHeaderException.class, () -> controller.apply(2L, null));
     }
 
     @Test
     void apply_withDifferentNonNullHeader_callsService_andReturnsDto() {
-        // If controller accepts non-null user ids (e.g. 18L), stub service and assert success
         ApplicationHistoryQueryDto dto = ApplicationHistoryQueryDto.builder()
                 .applicationId(11L)
                 .jobId(2L)
@@ -64,10 +60,9 @@ class ApplicationCommandControllerTest {
                 .status(ApplicationStatus.PENDING)
                 .build();
 
-        // stub for userId = 18L, jobId = 2L (note order: userId, jobId)
         when(commandService.apply(18L, 2L)).thenReturn(dto);
 
-        var resp = controller.apply(2L, 18L); // jobId = 2L, userId = 18L
+        var resp = controller.apply(2L, 18L);
         assertThat(resp.getStatusCode().is2xxSuccessful()).isTrue();
         assertThat(resp.getBody()).isEqualTo(dto);
 
@@ -82,7 +77,6 @@ class ApplicationCommandControllerTest {
         ApplicationStatusResponseDto respDto = ApplicationStatusResponseDto.builder()
                 .applicationId(5L).status(ApplicationStatus.REVIEWED).build();
 
-        // controller calls commandService.updateStatus(applicationId, status)
         when(commandService.updateStatus(5L, ApplicationStatus.REVIEWED)).thenReturn(respDto);
 
         var response = controller.updateStatus(5L, request);
