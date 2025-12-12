@@ -1,0 +1,47 @@
+spring:
+  application:
+    name: job-service
+
+  cloud:
+    config:
+      enabled: false
+      import-check:
+        enabled: false
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/jobdb
+    username: postgres
+    password: admin   # quote the password
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    validate-on-migrate: false
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+eureka:
+  client:
+    serverUrl:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    hostname: localhost
+    prefer-ip-address: true
+
+server:
+  port: 8001
