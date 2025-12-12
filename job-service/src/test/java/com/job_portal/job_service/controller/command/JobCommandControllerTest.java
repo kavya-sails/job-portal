@@ -11,7 +11,6 @@ import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
-
 import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,7 +38,6 @@ class JobCommandControllerTest {
 
     @BeforeEach
     void setUp() {
-        // MockitoExtension initializes mocks; do NOT call openMocks(this)
         globalExceptionHandler = new GlobalExceptionHandler();
     }
 
@@ -51,11 +49,11 @@ class JobCommandControllerTest {
                 .description("This description has at least twenty characters.")
                 .location("Bengaluru")
                 .experienceRequired(3)
-                .companyName("Company Inc")         // >= 2 chars
+                .companyName("Company Inc")
                 .expiryDays(10)
-                .education("B.Tech in CS")         // required field
-                .skills("Java, Spring Boot")       // required field (non-empty)
-                .packageOffered("10 LPA")          // required field (non-empty)
+                .education("B.Tech in CS")
+                .skills("Java, Spring Boot")
+                .packageOffered("10 LPA")
                 .build();
 
         JobDetailsQueryDto returned = JobDetailsQueryDto.builder()
@@ -78,38 +76,24 @@ class JobCommandControllerTest {
         verify(jobCommandService, times(1)).createJob(any(JobCommandDto.class));
     }
 
-//    @Test
-//    void createJob_invalidDto_handledByGlobalExceptionHandler_returnsValidationResponse() throws Exception {
-//        JobCommandDto bad = JobCommandDto.builder()
-//                .title("") // invalid: NotBlank
-//                .description("short") // invalid: too short
-//                .location("L")
-//                .experienceRequired(1)
-//                .companyName("C")
-//                .build();
-//
-//        // Validate DTO using validator
-//        Set<ConstraintViolation<JobCommandDto>> violations = validator.validate(bad);
-//        assertThat(violations).isNotEmpty();
-//
-//        // Build MethodArgumentNotValidException that mimics Spring MVC behavior
-//        // ValidationTestUtils.buildMethodArgNotValidException uses BeanPropertyBindingResult and rejects fields
-//        @SuppressWarnings("unchecked")
-//        MethodArgumentNotValidException ex = ValidationTestUtils.buildMethodArgNotValidException(bad, (Set) violations);
-//
-//        // mock HttpServletRequest so handler.getRequestURI() won't NPE
-//        HttpServletRequest req = mock(HttpServletRequest.class);
-//        when(req.getRequestURI()).thenReturn("/api/jobs");
-//
-//        // Call the handler with the mocked request
-//        var responseEntity = globalExceptionHandler.handleValidation(ex, req);
-//
-//        assertThat(responseEntity.getStatusCode().is4xxClientError()).isTrue();
-//        ApiErrorResponse body = responseEntity.getBody();
-//        assertThat(body).isNotNull();
-//        assertThat(body.getCode()).isEqualTo("VALIDATION_FAILED");
-//        assertThat(body.getErrors()).isNotEmpty();
-//        // ensure a field error exists for title or description
-//        assertThat(body.getErrors().keySet()).anyMatch(k -> k.equals("title") || k.equals("description"));
-//    }
+    @Test
+    void updateJob_invokesService_andReturnsDto() {
+        JobCommandDto dto = JobCommandDto.builder().title("T").build();
+        JobDetailsQueryDto returned = JobDetailsQueryDto.builder().jobId(2L).title("T").build();
+        when(jobCommandService.updateJob(2L, dto)).thenReturn(returned);
+
+        var resp = controller.updateJob(2L, dto);
+        assertThat(resp.getStatusCode().is2xxSuccessful()).isTrue();
+        assertThat(resp.getBody()).isEqualTo(returned);
+        verify(jobCommandService).updateJob(2L, dto);
+    }
+
+    @Test
+    void deleteJob_invokesService_andReturnsNoContent() {
+        doNothing().when(jobCommandService).deleteJob(3L);
+        var resp = controller.deleteJob(3L);
+        assertThat(resp.getStatusCode().is2xxSuccessful()).isTrue();
+        assertThat(resp.getStatusCode().value()).isEqualTo(204);
+        verify(jobCommandService).deleteJob(3L);
+    }
 }

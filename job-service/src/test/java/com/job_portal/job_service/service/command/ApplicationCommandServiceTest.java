@@ -21,16 +21,12 @@ import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-
 import java.time.Instant;
 import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-// Make Mockito lenient for this test class so unused global stubbings won't fail tests.
-// Alternative (recommended for stricter tests): remove global stubbing and stub per-test.
 @MockitoSettings(strictness = Strictness.LENIENT)
 class ApplicationCommandServiceTest {
 
@@ -43,7 +39,6 @@ class ApplicationCommandServiceTest {
     @Mock
     private ApplicationStatusPublisher statusPublisher;
 
-    // Mock the UserClient dependency so userClient is injected and not null
     @Mock
     private UserClient userClient;
 

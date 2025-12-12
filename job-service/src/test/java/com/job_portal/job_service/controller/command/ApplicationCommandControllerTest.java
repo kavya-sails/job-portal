@@ -6,14 +6,11 @@ import com.job_portal.job_service.dto.query.ApplicationHistoryQueryDto;
 import com.job_portal.job_service.entity.ApplicationStatus;
 import com.job_portal.job_service.exception.MissingUserIdHeaderException;
 import com.job_portal.job_service.service.command.ApplicationCommandService;
-import jakarta.ws.rs.BadRequestException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
-
 import java.time.Instant;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
