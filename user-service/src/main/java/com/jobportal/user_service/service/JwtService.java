@@ -28,7 +28,6 @@ public class JwtService {
         claims.put("username", user.getEmail());
         claims.put("role", user.getRole().getRoleName());
         claims.put("isActive", user.getIsActive());
-
         return Jwts
                 .builder()
                 .claims()

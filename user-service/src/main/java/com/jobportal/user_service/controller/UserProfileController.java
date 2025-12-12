@@ -17,7 +17,7 @@ import java.util.List;
 public class UserProfileController {
     private final UserProfileService userProfileService;
 
-    // CREATE: header ID is used as profile ID (FK to AuthUser.userId)
+    // Create user profile
     @PostMapping("/create")
     public ResponseEntity<UserProfileResponseDto> createUserProfile(
             @RequestHeader("X-User-Id") Long userId,
@@ -27,13 +27,14 @@ public class UserProfileController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    // checks if user is present in db
     @GetMapping("/apply/{userId}")
     public ResponseEntity<?> checkUser(@PathVariable Long userId) {
         userProfileService.checkUserExists(userId);
         return ResponseEntity.ok().build();
     }
 
-    // READ: service checks pathId vs headerId
+    // fetches user with specific id
     @GetMapping("/{id}")
     public ResponseEntity<UserProfileResponseDto> getById(
             @PathVariable Long id,
@@ -43,13 +44,14 @@ public class UserProfileController {
         return ResponseEntity.ok(response);
     }
 
+    // fetches all user profiles
     @GetMapping("/all")
     public ResponseEntity<List<UserProfileResponseDto>> getAll() {
         List<UserProfileResponseDto> list = userProfileService.getAllUserProfiles();
         return ResponseEntity.ok(list);
     }
 
-    //service checks pathId vs headerId
+    // Delete user profile
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(
             @PathVariable Long id,
@@ -59,7 +61,7 @@ public class UserProfileController {
         return ResponseEntity.noContent().build();
     }
 
-    // service checks pathId vs headerId
+    // update user profile
     @PutMapping("/{id}")
     public ResponseEntity<UserProfileResponseDto> update(
             @PathVariable Long id,
@@ -70,7 +72,7 @@ public class UserProfileController {
         return ResponseEntity.ok(response);
     }
 
-    // PARTIAL UPDATE: service checks pathId vs headerId
+    // Partial Update
     @PatchMapping("/{id}")
     public ResponseEntity<UserProfileResponseDto> patch(
             @PathVariable Long id,

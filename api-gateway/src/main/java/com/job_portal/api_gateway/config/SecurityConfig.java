@@ -36,6 +36,11 @@ public class SecurityConfig {
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers("/api/users/login", "/api/users/register", "/actuator/**").permitAll()
                         .pathMatchers("/api/users", "/api/users/profile/all").hasRole(Role.ADMIN.name())
+                        .pathMatchers(HttpMethod.DELETE,"/api/users/profile/{id}").hasRole(Role.ADMIN.name())
+                        .pathMatchers(HttpMethod.PUT,"/api/users/profile/{id}").hasRole(Role.USER.name())
+                        .pathMatchers(HttpMethod.PATCH,"/api/users/profile/{id}").hasRole(Role.USER.name())
+                        .pathMatchers(HttpMethod.GET,"/api/users/profile//{id}" ).hasRole(Role.USER.name())
+                        .pathMatchers(HttpMethod.POST,"/api/users/profile/create" ).hasRole(Role.USER.name())
                         .pathMatchers(HttpMethod.POST,"/api/jobs/applications/{jobId}").hasAnyRole(Role.USER.name())
                         .pathMatchers(HttpMethod.PUT,"/api/jobs/applications/{applicationId}/status").hasAnyRole(Role.RECRUITER.name())
                         .pathMatchers(HttpMethod.GET,"/api/jobs/applications/history/{userId}").hasAnyRole("ADMIN","USER")

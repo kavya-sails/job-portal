@@ -35,7 +35,6 @@ public class UserProfileRequestDto {
     @Past(message = "Date of birth must be in the past")
     private LocalDate dob;
 
-    // OPTIONAL
     @Size(max = 255, message = "Address must not exceed 255 characters")
     private String address;
 
@@ -46,7 +45,6 @@ public class UserProfileRequestDto {
     )
     private String phone;
 
-    // OPTIONAL
     @Size(max = 500, message = "Skills must not exceed 500 characters")
     @Pattern(
             regexp = "^[^,]+(,[^,]+)*$",
@@ -65,7 +63,6 @@ public class UserProfileRequestDto {
     @NotNull(message = "Experience level is required")
     private ExperienceLevel experienceLevel;
 
-    // REQUIRED & must be URL
     @NotBlank(message = "Resume URL is required")
     @Pattern(
             regexp = "^(http|https)://.*$",
@@ -73,14 +70,12 @@ public class UserProfileRequestDto {
     )
     private String resumeUrl;
 
-    // OPTIONAL
     @Pattern(
             regexp = "^(http|https)://.*$",
             message = "Portfolio URL must be a valid URL"
     )
     private String portfolioUrl;
 
-    // OPTIONAL
     @Pattern(
             regexp = "^(http|https)://.*$",
             message = "LinkedIn URL must be a valid URL"

@@ -75,5 +75,5 @@ public class UserProfilePartialUpdateDto {
     private String linkedinUrl;
 
     @Valid
-    private EducationDto education; // optional in PATCH; if sent, must be complete
+    private EducationDto education;
 }

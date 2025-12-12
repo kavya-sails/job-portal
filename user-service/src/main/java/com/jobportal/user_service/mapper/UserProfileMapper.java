@@ -22,7 +22,6 @@ public interface UserProfileMapper {
                     expression = "java(dto.getResumeUrl() != null ? java.time.LocalDateTime.now() : null)")
     })
     UserProfile toEntity(UserProfileRequestDto dto);
-
     UserProfileResponseDto toResponseDto(UserProfile user);
     List<UserProfileResponseDto> toResponseDTOList(List<UserProfile> users);
 
@@ -51,9 +50,6 @@ public interface UserProfileMapper {
             @Mapping(target = "education", ignore = true) // <---- IMPORTANT
     })
     void patchEntityFromDto(UserProfilePartialUpdateDto dto, @MappingTarget UserProfile entity);
-
-
-    // --------------- HELPERS ---------------
 
     default LocalDateTime updateResumeTimestamp(UserProfileRequestDto dto, UserProfile entity) {
         if (dto.getResumeUrl() != null && !dto.getResumeUrl().equals(entity.getResumeUrl())) {

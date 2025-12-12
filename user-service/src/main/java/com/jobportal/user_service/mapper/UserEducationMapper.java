@@ -12,7 +12,6 @@ public interface UserEducationMapper {
             @Mapping(target = "userProfile", ignore = true)
     })
     UserEducation toEntity(EducationDto dto);
-
     EducationDto toDto(UserEducation entity);
 
     // NEW: update existing entity instead of creating a new one

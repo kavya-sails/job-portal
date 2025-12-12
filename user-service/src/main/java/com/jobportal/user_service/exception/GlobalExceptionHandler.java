@@ -14,17 +14,15 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    // ---------- 404: UserProfile Not Found ----------
+    // UserProfile Not Found
     @ExceptionHandler(UserProfileNotFoundException.class)
     public ResponseEntity<ExceptionResponse> handleUserProfileNotFound(
             UserProfileNotFoundException ex,
@@ -33,7 +31,7 @@ public class GlobalExceptionHandler {
         return buildError(HttpStatus.NOT_FOUND, "User Profile Not Found", ex.getMessage(), req);
     }
 
-    // ---------- 404: Auth User Not Found ----------
+    // Auth User Not Found
     @ExceptionHandler(UserNotFound.class)
     public ResponseEntity<ExceptionResponse> handleUserNotFound(
             UserNotFound ex,
@@ -42,7 +40,7 @@ public class GlobalExceptionHandler {
         return buildError(HttpStatus.NOT_FOUND, "User Not Found", ex.getMessage(), req);
     }
 
-    // ---------- 403: Forbidden ----------
+    // Forbidden
     @ExceptionHandler(ForbiddenException.class)
     public ResponseEntity<ExceptionResponse> handleForbidden(
             ForbiddenException ex,
@@ -51,7 +49,7 @@ public class GlobalExceptionHandler {
         return buildError(HttpStatus.FORBIDDEN, "Forbidden", ex.getMessage(), req);
     }
 
-    // ---------- 409: Data Integrity ----------
+    // Data Integrity
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ExceptionResponse> handleCustomDataIntegrityViolation(
             DataIntegrityViolationException ex,
@@ -60,7 +58,7 @@ public class GlobalExceptionHandler {
         return buildError(HttpStatus.CONFLICT, "Conflict", ex.getMessage(), req);
     }
 
-    // ---------- 400: @Valid errors ----------
+    // @Valid errors
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ExceptionResponse> handleValidationErrors(
             MethodArgumentNotValidException ex,
@@ -78,7 +76,7 @@ public class GlobalExceptionHandler {
         return fe.getField() + ": " + fe.getDefaultMessage();
     }
 
-    // ---------- 400: Constraint Violations ----------
+    // Constraint Violations
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ExceptionResponse> handleConstraintViolation(
             ConstraintViolationException ex,
@@ -91,7 +89,7 @@ public class GlobalExceptionHandler {
         return buildError(HttpStatus.BAD_REQUEST, "Validation Error", msg, req);
     }
 
-    // ---------- 400: JSON Parsing / Enum / Date / Type errors ----------
+    // JSON Parsing / Enum / Date / Type errors
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ExceptionResponse> handleHttpMessageNotReadable(
             HttpMessageNotReadableException ex,
@@ -142,7 +140,7 @@ public class GlobalExceptionHandler {
         return buildError(HttpStatus.BAD_REQUEST, "Invalid Request Body", message, req);
     }
 
-    // ---------- 400: Wrong type for query/path params ----------
+    // Wrong type for query/path params
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ExceptionResponse> handleTypeMismatch(
             MethodArgumentTypeMismatchException ex,
@@ -153,11 +151,10 @@ public class GlobalExceptionHandler {
                 ex.getName(),
                 ex.getRequiredType() != null ? ex.getRequiredType().getSimpleName() : "unknown"
         );
-
         return buildError(HttpStatus.BAD_REQUEST, "Type Mismatch", message, req);
     }
 
-    // ---------- 500: fallback ----------
+    // fallback
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ExceptionResponse> handleAll(
             Exception ex,
@@ -167,7 +164,7 @@ public class GlobalExceptionHandler {
         return buildError(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error", ex.getMessage(), req);
     }
 
-    // ---------- Helper ----------
+    // Helper
     private ResponseEntity<ExceptionResponse> buildError(
             HttpStatus status,
             String error,
@@ -196,5 +193,4 @@ public class GlobalExceptionHandler {
                 req
         );
     }
-
 }

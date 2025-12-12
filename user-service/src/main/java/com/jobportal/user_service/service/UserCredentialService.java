@@ -29,13 +29,11 @@ public class UserCredentialService {
         }
         Role role = roleRepository.findByRoleName(request.getRoleName())
                 .orElseThrow(() -> new RuntimeException("Role not found"));
-
         UserCredential user = new UserCredential();
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword())); //  encrypted
         user.setRole(role);
         user.setIsActive(true);
-
         userCredentialRepository.save(user);
         return "User registered successfully";
     }
@@ -50,17 +48,13 @@ public class UserCredentialService {
 
         //  If authenticated, fetch user & generate token
         if (authentication.isAuthenticated()) {
-
             UserCredential user = userCredentialRepository.findByEmail(request.getEmail())
                     .orElseThrow(() -> new RuntimeException("User not found"));
-
             if (!user.getIsActive()) {
                 return "Account is deactivated";
             }
-
             return jwtService.generateToken(user);
         }
-
         throw new RuntimeException("Invalid email or password");
     }
 

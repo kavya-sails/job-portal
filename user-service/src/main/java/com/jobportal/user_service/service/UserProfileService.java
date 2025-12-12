@@ -31,8 +31,6 @@ public class UserProfileService {
     private final UserCredentialRepository userCredentialRepository;
     private final UserProfileMapper userProfileMapper;
     private final UserEducationMapper userEducationMapper;
-
-
     public UserProfileResponseDto createUserProfile(UserProfileRequestDto dto, Long headerUserId) {
 
         // Prevent duplicate profiles for same auth user
@@ -41,6 +39,7 @@ public class UserProfileService {
                     "User profile already exists for userId: " + headerUserId
             );
         }
+
         // Ensure AuthUser exists
         UserCredential authUser = userCredentialRepository.findById(headerUserId)
                 .orElseThrow(() -> new UserNotFound(
@@ -66,7 +65,6 @@ public class UserProfileService {
         }
     }
 
-
     public UserProfileResponseDto getUserProfileById(Long pathId, Long headerUserId) {
 
         if (!pathId.equals(headerUserId)) {
@@ -79,18 +77,14 @@ public class UserProfileService {
                 .orElseThrow(() ->
                         new UserProfileNotFoundException("User profile not found with id: " + pathId)
                 );
-
         UserCredential authUser = userCredentialRepository.findById(pathId)
                 .orElseThrow(() -> new UserNotFound(
                         "Auth user not found with id: " + pathId
                 ));
-
         UserProfileResponseDto response = userProfileMapper.toResponseDto(userProfile);
         response.setEmail(authUser.getEmail());
-
         return response;
     }
-
 
     public List<UserProfileResponseDto> getAllUserProfiles() {
         List<UserProfile> users = userProfileRepository.findAll();
@@ -102,10 +96,8 @@ public class UserProfileService {
                     authUser -> resp.setEmail(authUser.getEmail())
             );
         }
-
         return responseList;
     }
-
 
     public void deleteUserProfileById(Long pathId, Long headerUserId) {
 
@@ -114,7 +106,6 @@ public class UserProfileService {
                     "You are not allowed to delete this profile"
             );
         }
-
         UserProfile userProfile = userProfileRepository.findById(pathId)
                 .orElseThrow(() ->
                         new UserProfileNotFoundException("User profile not found with id: " + pathId)
@@ -123,27 +114,22 @@ public class UserProfileService {
         userProfileRepository.delete(userProfile);
     }
 
-
     public UserProfileResponseDto updateUserProfile(Long pathId, Long headerUserId, UserProfileRequestDto dto) {
-
         if (!pathId.equals(headerUserId)) {
             throw new ForbiddenException(
                     "You are not allowed to update this profile"
             );
         }
-
         UserProfile userProfile = userProfileRepository.findById(pathId)
                 .orElseThrow(() ->
                         new UserProfileNotFoundException("User profile not found with id: " + pathId)
                 );
 
         String oldResumeUrl = userProfile.getResumeUrl();
-
         UserCredential authUser = userCredentialRepository.findById(pathId)
                 .orElseThrow(() -> new UserNotFound(
                         "Auth user not found with id: " + pathId
                 ));
-
         try {
             // Map scalar fields, but NOT education (we ignored it in mapper)
             userProfileMapper.updateEntityFromDto(dto, userProfile);
@@ -162,19 +148,12 @@ public class UserProfileService {
                     );
                 }
             }
-
             updateResumeTimestampIfChanged(oldResumeUrl, userProfile.getResumeUrl(), userProfile);
-
-
             recalculateProfileCompletion(userProfile);
-
             UserProfile updatedUser = userProfileRepository.save(userProfile);
-
             UserProfileResponseDto response = userProfileMapper.toResponseDto(updatedUser);
             response.setEmail(authUser.getEmail());
-
             return response;
-
         } catch (org.springframework.dao.DataIntegrityViolationException ex) {
             // optionally log the root cause to see exact DB error
             // ex.getMostSpecificCause().printStackTrace();
@@ -184,28 +163,21 @@ public class UserProfileService {
         }
     }
 
-
-
     public UserProfileResponseDto partialUpdateUserProfile(Long pathId, Long headerUserId, UserProfilePartialUpdateDto dto) {
         if (!pathId.equals(headerUserId)) {
             throw new ForbiddenException(
                     "You are not allowed to update this profile"
             );
         }
-
         UserProfile userProfile = userProfileRepository.findById(pathId)
                 .orElseThrow(() ->
                         new UserProfileNotFoundException("User profile not found with id: " + pathId)
                 );
-
         String oldResumeUrl = userProfile.getResumeUrl();
-
-
         UserCredential authUser = userCredentialRepository.findById(pathId)
                 .orElseThrow(() -> new UserNotFound(
                         "Auth user not found with id: " + pathId
                 ));
-
         try {
             userProfileMapper.patchEntityFromDto(dto, userProfile);
 
@@ -222,17 +194,11 @@ public class UserProfileService {
                     );
                 }
             }
-
             updateResumeTimestampIfChanged(oldResumeUrl, userProfile.getResumeUrl(), userProfile);
-
-
             recalculateProfileCompletion(userProfile);
-
             UserProfile updatedUser = userProfileRepository.save(userProfile);
-
             UserProfileResponseDto response = userProfileMapper.toResponseDto(updatedUser);
             response.setEmail(authUser.getEmail());
-
             return response;
 
         } catch (org.springframework.dao.DataIntegrityViolationException ex) {
@@ -242,17 +208,10 @@ public class UserProfileService {
         }
     }
 
-
-
     private void recalculateProfileCompletion(UserProfile profile) {
         int percentage = calculateProfileCompletionPercentage(profile);
         profile.setProfileCompletionPercentage(percentage);
     }
-
-    /**
-     * Calculate completion based on non-empty user-facing fields only.
-     * Ignores technical fields like id, createdAt, updatedAt, resumeUploadedAt.
-     */
     private int calculateProfileCompletionPercentage(UserProfile profile) {
 
         Stream<Object> profileFields = Stream.of(
@@ -271,7 +230,6 @@ public class UserProfileService {
         );
 
         UserEducation edu = profile.getEducation();
-
         Stream<Object> educationFields = edu == null ? Stream.empty() : Stream.of(
                 edu.getHighestEducation(),
                 edu.getSpecialisation(),
@@ -282,17 +240,13 @@ public class UserProfileService {
         );
 
         List<Object> allFields = Stream.concat(profileFields, educationFields).toList();
-
         long total = allFields.size();
         if (total == 0) return 0;
-
         long filled = allFields.stream()
                 .filter(v -> v != null && (!(v instanceof String s) || !s.trim().isEmpty()))
                 .count();
-
         return (int) Math.round((filled * 100.0) / total);
     }
-
     private void updateResumeTimestampIfChanged(String oldUrl, String newUrl, UserProfile profile) {
         if (newUrl != null && !newUrl.equals(oldUrl)) {
             profile.setResumeUploadedAt(LocalDateTime.now());
@@ -301,7 +255,7 @@ public class UserProfileService {
     public void checkUserExists(Long userId) {
         boolean exists = userProfileRepository.existsById(userId);
         if (!exists) {
-            throw new UserNotFound("User not found");
+            throw new UserNotFound("User must create profile or user must have a profile");
         }
     }
 }
