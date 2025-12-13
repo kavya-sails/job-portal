@@ -1,0 +1,21 @@
+CREATE TABLE user_profile (
+    id BIGINT NOT NULL PRIMARY KEY,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    dob DATE,
+    address VARCHAR(255),
+    phone VARCHAR(15),
+    skills VARCHAR(500),
+    experience INT,
+    job_role VARCHAR(50),
+    experience_level VARCHAR(100),
+    profile_completion_percentage INT,
+    resume_url VARCHAR(255) NOT NULL,
+    resume_uploaded_at TIMESTAMP,
+    portfolio_url VARCHAR(255),
+    linkedin_url VARCHAR(255),
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_user_profile_credentials FOREIGN KEY (id) REFERENCES credentials (user_id) ON DELETE CASCADE
+);

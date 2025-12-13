@@ -1,0 +1,15 @@
+package com.jobportal.user_service.enums;
+
+public enum JobRole {
+    SOFTWARE_ENGINEER,
+    BACKEND_DEVELOPER,
+    FRONTEND_DEVELOPER,
+    FULLSTACK_DEVELOPER,
+    QA_ENGINEER,
+    DEVOPS_ENGINEER,
+    DATA_ENGINEER,
+    DATA_SCIENTIST,
+    PRODUCT_MANAGER,
+    DESIGNER,
+    OTHER
+}
