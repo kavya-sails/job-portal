@@ -42,6 +42,7 @@ public class JobCommandDto {
     @NotBlank(message = "packageOffered is required and cannot be empty")
     @Size(max = 255, message = "Package offered must be at most 255 characters")
     @Schema(description = "Package offered", example = "12 LPA")
+    @Pattern(regexp = "^\\d+(?:\\.\\d+)?-\\d+(?:\\.\\d+)? LPA$", message = "Salary range must be in format: '13-14 LPA' or '13.2-14.5 LPA'")
     private String packageOffered;
 
     @NotBlank(message = "Skills field is required (recruiter must provide relevant skills)")
