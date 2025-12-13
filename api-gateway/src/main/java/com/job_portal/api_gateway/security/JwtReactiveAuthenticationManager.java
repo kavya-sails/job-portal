@@ -68,7 +68,7 @@ public class JwtReactiveAuthenticationManager implements ReactiveAuthenticationM
                 //if introspection unreachable fallback to local JWT validation
                 .onErrorResume(ex -> {
                     log.error("Introspection call failed: {}", ex.getMessage());
-                    return Mono.just(buildSuccessAuth(userId, username, role, jti, jwt.getClaims()));
+                    return Mono.error(new BadCredentialsException("Introspection failed", ex));
                 });
     }
 
