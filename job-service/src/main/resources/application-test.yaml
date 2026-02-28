@@ -1,0 +1,25 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    defer-datasource-initialization: true
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  sql:
+    init:
+      mode: never
+
+  flyway:
+    enabled: false
+  task:
+    scheduling:
+      enabled: false
+    # allow bean overriding (keeps tests flexible for mocking)
+    main:
+      allow-bean-definition-overriding: true
